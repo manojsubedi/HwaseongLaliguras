@@ -10,6 +10,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Sans+KR:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+  // Fallback if jsDelivr blocked — try unpkg
+  if (typeof QRCode === 'undefined') {
+    document.write('<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"><\/script>');
+  }
+</script>
+<script>
+  // Second fallback — cdnjs
+  if (typeof QRCode === 'undefined') {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"><\/script>');
+  }
+</script>
 <script src="config.js"></script>
 
 <style>
@@ -348,6 +360,12 @@
   $('menuUrl').value = DEFAULT_URL;
 
   async function generateQR() {
+    if (typeof QRCode === 'undefined') {
+      showToast('QR library failed to load — check your internet connection', 'error');
+      console.error('QRCode library not available');
+      return;
+    }
+
     const url = $('menuUrl').value.trim();
     if (!url) { showToast('Enter a URL first'); return; }
 
@@ -361,18 +379,23 @@
       color: { dark: color, light: '#FFFFFF' }
     };
 
-    // Plain QR on canvas
-    await QRCode.toCanvas($('plainQRCanvas'), url, opts);
+    try {
+      // Plain QR on canvas
+      await QRCode.toCanvas($('plainQRCanvas'), url, opts);
 
-    // Smaller QR for the card
-    await QRCode.toCanvas($('cardQRCanvas'), url, {
-      ...opts,
-      width: 400,
-      margin: 1
-    });
+      // Smaller QR for the card
+      await QRCode.toCanvas($('cardQRCanvas'), url, {
+        ...opts,
+        width: 400,
+        margin: 1
+      });
 
-    $('urlDisplay').textContent = url;
-    $('testUrlBtn').href = url;
+      $('urlDisplay').textContent = url;
+      $('testUrlBtn').href = url;
+    } catch (err) {
+      showToast(`Failed to generate QR: ${err.message}`, 'error');
+      console.error(err);
+    }
   }
 
   $('generateBtn').addEventListener('click', generateQR);
@@ -405,6 +428,10 @@
 
   // Download branded card — render preview to image at print resolution
   $('downloadCardBtn').addEventListener('click', async () => {
+    if (typeof QRCode === 'undefined') {
+      showToast('QR library not loaded yet — please refresh', 'error');
+      return;
+    }
     showToast('Generating print-ready card…');
     const url = $('menuUrl').value.trim();
     const color = $('qrColor').value;
@@ -531,8 +558,27 @@
     showToast('Card downloaded — 105×148mm @ 300 DPI');
   });
 
-  // Boot
-  generateQR();
+  // Boot — wait for QRCode library to be ready
+  function bootWhenReady() {
+    if (typeof QRCode !== 'undefined') {
+      generateQR();
+    } else {
+      // Wait up to 5 seconds for library to load
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (typeof QRCode !== 'undefined') {
+          clearInterval(interval);
+          generateQR();
+        } else if (attempts > 50) {  // 5 seconds
+          clearInterval(interval);
+          showToast('QR library could not load. Refresh the page.', 'error');
+        }
+      }, 100);
+    }
+  }
+
+  bootWhenReady();
 </script>
 
 </body>

@@ -199,7 +199,7 @@
     background: var(--surface); border: 1px solid var(--line);
     border-radius: 10px; padding: 14px 16px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto;
     align-items: center; gap: 12px;
     transition: border-color 0.15s ease;
   }
@@ -286,6 +286,99 @@
   .checkbox-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
   .checkbox-row label { cursor: pointer; flex: 1; font-size: 13px; font-weight: 500; }
   .checkbox-row .hint { color: var(--ink-mute); font-size: 11px; font-weight: 400; }
+
+  /* ============ IMAGE UPLOAD ============ */
+  .image-upload {
+    position: relative;
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    transition: all 0.2s ease;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .image-upload:hover { border-color: var(--brand); background: var(--brand-soft); }
+  .image-upload.has-image {
+    border-style: solid;
+    cursor: default;
+    background: var(--surface);
+  }
+  .image-upload.dragging { border-color: var(--brand); background: var(--brand-soft); }
+
+  .image-upload-empty {
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--ink-mute);
+  }
+  .image-upload.has-image .image-upload-empty { display: none; }
+
+  .image-upload-empty .icon {
+    font-size: 32px; margin-bottom: 8px; opacity: 0.5;
+  }
+  .image-upload-empty .primary {
+    font-weight: 600; color: var(--ink-soft); margin-bottom: 4px;
+  }
+  .image-upload-empty .hint {
+    font-size: 12px; color: var(--ink-mute);
+  }
+
+  .image-preview {
+    display: none;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--bg);
+  }
+  .image-upload.has-image .image-preview { display: block; }
+  .image-preview img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .image-actions {
+    position: absolute; top: 12px; right: 12px;
+    display: flex; gap: 6px;
+  }
+  .image-action-btn {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.15s ease;
+  }
+  .image-action-btn:hover { background: var(--ink); color: #fff; }
+  .image-action-btn.danger:hover { background: var(--danger); }
+
+  .image-upload-progress {
+    display: none;
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6); color: #fff;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px;
+    font-size: 13px;
+  }
+  .image-upload.uploading .image-upload-progress { display: flex; }
+  .image-upload.uploading .image-upload-empty,
+  .image-upload.uploading .image-preview { opacity: 0.4; }
+  .upload-spinner {
+    width: 24px; height: 24px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .image-upload input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+    font-size: 0;
+  }
+  .image-upload.has-image input[type=file] {
+    pointer-events: none;
+  }
 
   /* Toast */
   .toast {
@@ -427,6 +520,31 @@
         <div class="field">
           <label>Section</label>
           <select id="itemSection" required></select>
+        </div>
+
+        <!-- Image upload -->
+        <div class="field">
+          <label>Photo <span style="color: var(--ink-mute); font-weight: 400; text-transform: none; letter-spacing: 0;">(optional, max 5MB)</span></label>
+          <div class="image-upload" id="imageUpload">
+            <div class="image-upload-empty">
+              <div class="icon">📷</div>
+              <div class="primary">Tap to upload photo</div>
+              <div class="hint">JPG, PNG or WebP · best size: 1200×900</div>
+            </div>
+            <div class="image-preview">
+              <img id="imagePreview" alt="">
+              <div class="image-actions">
+                <button type="button" class="image-action-btn" id="changeImageBtn">Change</button>
+                <button type="button" class="image-action-btn danger" id="removeImageBtn">Remove</button>
+              </div>
+            </div>
+            <div class="image-upload-progress">
+              <div class="upload-spinner"></div>
+              <div id="uploadProgressText">Uploading…</div>
+            </div>
+            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp">
+          </div>
+          <input type="hidden" id="itemImageUrl">
         </div>
 
         <div class="row cols-2">
@@ -733,6 +851,9 @@
     const markCls = item.is_veg ? 'item-mark' : 'item-mark nv';
     const spice = item.spice_level ? `<span class="sp">${'●'.repeat(item.spice_level)}</span>` : '';
     const sig = item.is_signature ? '<span class="sig">★ SIG</span>' : '';
+    const thumb = item.image_url
+      ? `<img src="${item.image_url}" alt="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--line);">`
+      : `<div style="width: 40px; height: 40px; border-radius: 6px; border: 1px dashed var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 16px;">📷</div>`;
     return `
       <div class="item-row ${item.available ? '' : 'unavail'}" data-id="${item.id}">
         <div class="${markCls}"></div>
@@ -740,6 +861,7 @@
           <div class="name">${item.name_en} ${spice} ${sig}</div>
           <div class="kr">${item.name_kr || ''}</div>
         </div>
+        ${thumb}
         <div class="item-price">₩${fmt(item.price)}</div>
         <div class="item-actions">
           <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation(); openItemModal(${item.id})">Edit</button>
@@ -773,16 +895,151 @@
       $('itemVeg').checked = item.is_veg;
       $('itemSignature').checked = item.is_signature;
       $('itemAvailable').checked = item.available;
+      // Image
+      setImagePreview(item.image_url);
     } else {
       $('itemForm').reset();
       $('itemId').value = '';
       $('itemAvailable').checked = true;
       // Default to currently filtered section if any
       if (currentSectionFilter !== 'all') $('itemSection').value = currentSectionFilter;
+      // Reset image
+      setImagePreview(null);
     }
 
     $('itemModal').classList.add('active');
   }
+
+  // ============ IMAGE UPLOAD ============
+  function setImagePreview(url) {
+    const wrap = $('imageUpload');
+    $('itemImageUrl').value = url || '';
+    if (url) {
+      $('imagePreview').querySelector('img').src = url;
+      wrap.classList.add('has-image');
+    } else {
+      wrap.classList.remove('has-image');
+      $('imagePreview').querySelector('img').src = '';
+    }
+  }
+
+  async function uploadImage(file) {
+    const wrap = $('imageUpload');
+    wrap.classList.add('uploading');
+    $('uploadProgressText').textContent = 'Uploading…';
+
+    try {
+      // Validate file
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File too large (max 5MB)');
+      }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        throw new Error('Only JPG, PNG, or WebP images allowed');
+      }
+
+      // Compress/resize before upload (max 1600px wide, keeps file small)
+      const compressed = await compressImage(file);
+      $('uploadProgressText').textContent = 'Uploading…';
+
+      // Generate unique filename
+      const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+      const filename = `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabaseClient.storage
+        .from('menu-photos')
+        .upload(filename, compressed, {
+          cacheControl: '31536000',  // 1 year cache
+          upsert: false,
+          contentType: compressed.type
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabaseClient.storage
+        .from('menu-photos')
+        .getPublicUrl(filename);
+
+      setImagePreview(publicUrl);
+      showToast('Photo uploaded', 'success');
+    } catch (err) {
+      showToast(`Upload failed: ${err.message}`, 'error');
+    } finally {
+      wrap.classList.remove('uploading');
+      $('imageFile').value = '';  // reset file input
+    }
+  }
+
+  // Client-side resize: keeps Supabase storage small + faster uploads on mobile data
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_W = 1600;
+        const scale = Math.min(1, MAX_W / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          blob => {
+            if (!blob) return reject(new Error('Compression failed'));
+            resolve(blob);
+          },
+          'image/jpeg',
+          0.85  // quality
+        );
+      };
+      img.onerror = () => reject(new Error('Could not read image'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Set up image upload handlers (once)
+  $('imageFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) uploadImage(file);
+  });
+
+  $('changeImageBtn').addEventListener('click', () => {
+    $('imageFile').click();
+  });
+
+  $('removeImageBtn').addEventListener('click', async () => {
+    const url = $('itemImageUrl').value;
+    if (url) {
+      // Try to delete from storage (best effort)
+      try {
+        const path = url.split('/menu-photos/')[1];
+        if (path) {
+          await supabaseClient.storage.from('menu-photos').remove([path]);
+        }
+      } catch (e) { /* ignore */ }
+    }
+    setImagePreview(null);
+    showToast('Photo removed', '');
+  });
+
+  // Drag and drop
+  ['dragenter', 'dragover'].forEach(evt => {
+    $('imageUpload').addEventListener(evt, (e) => {
+      e.preventDefault();
+      $('imageUpload').classList.add('dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    $('imageUpload').addEventListener(evt, (e) => {
+      e.preventDefault();
+      $('imageUpload').classList.remove('dragging');
+    });
+  });
+  $('imageUpload').addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) uploadImage(file);
+  });
 
   function closeItemModal() {
     $('itemModal').classList.remove('active');
@@ -807,6 +1064,7 @@
       is_veg: $('itemVeg').checked,
       is_signature: $('itemSignature').checked,
       available: $('itemAvailable').checked,
+      image_url: $('itemImageUrl').value || null,
     };
 
     showLoading();
@@ -871,6 +1129,7 @@
             <div class="name">${s.name_en}</div>
             <div class="kr">${s.name_kr || ''} · ${counts[s.id] || 0} items</div>
           </div>
+          <div></div>
           <div></div>
           <div class="item-actions">
             <button class="btn btn-sm btn-ghost" onclick="editSection(${s.id})">Edit</button>

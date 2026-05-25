@@ -199,6 +199,27 @@
   /* ITEMS */
   .item { padding: var(--s-5) 0; border-bottom: 1px solid var(--line-soft); }
   .item:last-child { border-bottom: none; }
+  .item-photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: var(--s-4);
+    background: var(--paper-warm);
+    position: relative;
+  }
+  .item-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.4s ease;
+  }
+  .item-photo img.loaded {
+    animation: photoFadeIn 0.4s ease;
+  }
+  @keyframes photoFadeIn {
+    from { opacity: 0; transform: scale(1.02); }
+    to { opacity: 1; transform: scale(1); }
+  }
   .item-head {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: var(--s-3); margin-bottom: var(--s-1);
@@ -410,8 +431,12 @@
   function renderItem(item) {
     const mark = item.is_veg ? 'mark' : 'mark nv';
     const featured = item.is_signature ? ' featured' : '';
+    const photo = item.image_url
+      ? `<div class="item-photo"><img src="${item.image_url}" alt="${item.name_en}" loading="lazy" onload="this.classList.add('loaded')"></div>`
+      : '';
     return `
       <div class="item${featured}">
+        ${photo}
         <div class="item-head">
           <span class="item-name"><span class="${mark}"></span>${item.name_en}${spiceMarks(item.spice_level)}</span>
           <span class="item-price"><span class="currency">₩</span>${fmtPrice(item.price)}</span>
