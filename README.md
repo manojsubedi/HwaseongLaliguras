@@ -7,36 +7,40 @@ Authentic Nepali & Indian cuisine in Hwaseong, established 2015.
 
 ---
 
-## About this repo
+## 📱 Pages
 
-This repository hosts the mobile-friendly digital menu for Laliguras Restaurant, served via GitHub Pages and accessed by customers through QR codes on each table.
-
-### Files
-
-| File | Purpose |
+| URL | Purpose |
 |---|---|
-| `index.html` | The menu page itself (single-file mobile site) |
-| `logo.png` | Restaurant logo (loaded by the menu page) |
+| `/` | Customer menu (where QR codes point) |
+| `/admin.html` | Menu management (login required) |
+| `/qr.html` | QR code generator |
 
-### How to update the menu
+---
 
-1. Edit `index.html` directly on GitHub (click pencil icon)
-2. Or download, edit on your computer, and re-upload via **Add file → Upload files**
-3. Changes appear within 1–2 minutes
-4. QR codes don't change — they point to the same URL
+## 🛠 Stack
 
-### Stack
+- **Frontend**: Vanilla HTML/CSS/JS — no build step
+- **Database**: Supabase (PostgreSQL) — free tier
+- **Hosting**: GitHub Pages — free
+- **QR codes**: `qrcode.js` library
 
-- Pure HTML + CSS + vanilla JavaScript (no build step, no dependencies)
-- Google Fonts: Fraunces, Inter, Noto Sans KR, Tiro Devanagari Hindi
-- ~65 KB total — loads instantly on mobile data
+## 📝 First-time setup
 
-### Design language
+See `SETUP_GUIDE.md` for the full walkthrough (15 minutes).
 
-- **Red** — rhododendron (the laliguras flower) + meat sections
-- **Navy blue** — logo ring + structural elements
-- **Green** — logo banner + vegetarian items
-- **Gold** — heritage accent + signature dishes
+## 🔄 Updating the menu
+
+Sign into `/admin.html` with your Supabase credentials and edit items directly. Changes appear on the customer menu within 1-2 minutes.
+
+## 🎨 Design system
+
+Per-section accent colors:
+- 🟥 Red — Meat dishes (chicken, mutton, tandoor)
+- 🟦 Blue — Cool / mountain dishes, drinks
+- 🟩 Green — Vegetarian
+- 🟨 Gold — Grains, breads, sweets, heritage
+
+Typography: Fraunces (serif headings) + Inter (sans) + Noto Sans KR + Tiro Devanagari Hindi.
 
 ---
 

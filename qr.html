@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laliguras · QR Generator</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Sans+KR:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="config.js"></script>
+
+<style>
+  :root {
+    --bg: #F7F7F5;
+    --surface: #FFFFFF;
+    --ink: #161616;
+    --ink-soft: #383838;
+    --ink-mute: #6B6B6B;
+    --ink-faint: #B5B5B5;
+    --brand: #B91C2C;
+    --brand-deep: #7A0F1A;
+    --brand-soft: #FBE9EB;
+    --blue: #1E3A6F;
+    --gold: #C9A227;
+    --gold-soft: #FFF8E1;
+    --line: #E5E5E2;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; }
+  .topbar-brand img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); }
+  .topbar-brand .name {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px; color: var(--brand);
+  }
+  .topbar-brand .sub {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute);
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+  h1 {
+    font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    color: var(--ink-mute); margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 24px; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  .card h2 {
+    font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card .hint {
+    font-size: 12px; color: var(--ink-mute); margin-bottom: 16px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--ink-soft); margin-bottom: 6px; letter-spacing: 0.04em;
+  }
+  .field input, .field select {
+    width: 100%; padding: 10px 12px;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px;
+  }
+  .field input:focus, .field select:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-soft);
+  }
+  .row { display: grid; gap: 12px; }
+  .row.cols-2 { grid-template-columns: 1fr 1fr; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 16px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink);
+    border-radius: 8px; font-weight: 500; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { border-color: var(--ink-mute); }
+  .btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .btn-primary:hover { background: var(--brand-deep); border-color: var(--brand-deep); }
+  .btn-block { width: 100%; }
+
+  /* Preview area */
+  .preview-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  @media (max-width: 720px) {
+    .preview-grid { grid-template-columns: 1fr; }
+  }
+  .preview-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 24px;
+    text-align: center;
+  }
+  .preview-card h3 {
+    font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  /* The actual QR card preview */
+  .qr-card-preview {
+    aspect-ratio: 105 / 148;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 0 auto 16px;
+    max-width: 280px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .qr-card-preview::before {
+    content: ''; position: absolute; inset: 8px;
+    border: 1px solid var(--line); border-radius: 8px; pointer-events: none;
+  }
+  .qrc-logo {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 1px solid var(--line); margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(139,26,26,0.15);
+  }
+  .qrc-scan {
+    font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 600;
+    letter-spacing: 0.3em; color: var(--gold); margin-top: 12px;
+    text-transform: uppercase;
+  }
+  .qrc-scan-kr {
+    font-size: 9px; color: var(--ink-mute); margin-top: 2px;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .qrc-name {
+    font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700;
+    color: var(--brand); margin-top: 6px; letter-spacing: 0.04em;
+  }
+  .qrc-deva {
+    font-family: 'Tiro Devanagari Hindi', serif; font-size: 11px;
+    color: var(--gold); margin-top: 1px;
+  }
+  .qrc-kr {
+    font-family: 'Noto Sans KR', sans-serif; font-size: 11px; font-weight: 600;
+    color: var(--ink-soft); margin-top: 1px;
+  }
+  .qrc-sub {
+    font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 600;
+    letter-spacing: 0.2em; color: var(--ink-soft); margin-top: 6px;
+  }
+  .qrc-sub-kr {
+    font-size: 8px; color: var(--ink-mute); margin-top: 1px;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .qrc-qr {
+    margin: 10px auto;
+    padding: 6px; background: #fff;
+    border: 1px solid var(--gold); border-radius: 4px;
+  }
+  .qrc-qr img, .qrc-qr canvas {
+    display: block; width: 100%; height: auto; max-width: 130px;
+  }
+  .qrc-bottom {
+    font-family: 'Inter', sans-serif; font-size: 7px;
+    color: var(--ink-mute); font-style: italic;
+  }
+
+  /* Plain QR preview */
+  #plainQRCanvas {
+    display: block; margin: 0 auto;
+    max-width: 100%; height: auto;
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px; background: #fff;
+  }
+
+  /* Action buttons */
+  .actions {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  }
+  .actions .btn { font-size: 13px; padding: 8px 14px; }
+
+  /* URL display */
+  .url-box {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; word-break: break-all;
+    color: var(--ink-soft); margin-bottom: 12px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff;
+    padding: 12px 20px; border-radius: 8px; font-size: 13px;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <img src="logo.png" alt="">
+    <div>
+      <div class="name">Laliguras</div>
+      <div class="sub">QR Generator</div>
+    </div>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="admin.html" class="btn" style="font-size: 13px; padding: 6px 12px;">← Admin</a>
+    <a href="index.html" class="btn" style="font-size: 13px; padding: 6px 12px;" target="_blank">View menu →</a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>QR Code Generator</h1>
+  <p class="subtitle">Generate QR codes that link to your menu — print them for tables, posters, or stickers.</p>
+
+  <div class="card">
+    <h2>Menu URL</h2>
+    <p class="hint">This is where customers will be taken when they scan.</p>
+    <div class="field">
+      <input type="url" id="menuUrl" placeholder="https://manojsubedi.github.io/HwaseongLaliguras/">
+    </div>
+    <p class="hint">💡 You can also generate QR codes that link to a specific table — add a parameter like <code>?table=5</code> to track tables.</p>
+  </div>
+
+  <div class="card">
+    <h2>QR style</h2>
+    <p class="hint">Customize how the QR looks.</p>
+    <div class="row cols-2">
+      <div class="field">
+        <label>QR color</label>
+        <select id="qrColor">
+          <option value="#1E3A6F">Navy blue (matches logo)</option>
+          <option value="#B91C2C">Brand red</option>
+          <option value="#000000">Black (highest scannability)</option>
+          <option value="#2D7A3F">Green</option>
+          <option value="#C9A227">Gold</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Size</label>
+        <select id="qrSize">
+          <option value="600">Medium (600px)</option>
+          <option value="900" selected>Large (900px) — recommended</option>
+          <option value="1200">Extra large (1200px)</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions" style="justify-content: flex-end;">
+      <button class="btn btn-primary" id="generateBtn">Generate QR</button>
+    </div>
+  </div>
+
+  <div class="preview-grid">
+    <!-- Plain QR -->
+    <div class="preview-card">
+      <h3>Plain QR</h3>
+      <canvas id="plainQRCanvas"></canvas>
+      <div class="actions" style="margin-top: 16px;">
+        <button class="btn" id="downloadPlainBtn">Download PNG</button>
+        <button class="btn" id="copyUrlBtn">Copy URL</button>
+      </div>
+    </div>
+
+    <!-- Branded table card -->
+    <div class="preview-card">
+      <h3>Branded Table Card</h3>
+      <div class="qr-card-preview" id="tableCardPreview">
+        <img src="logo.png" class="qrc-logo" alt="">
+        <div class="qrc-scan">SCAN · VIEW · ENJOY</div>
+        <div class="qrc-scan-kr">메뉴를 보려면 QR을 스캔하세요</div>
+        <div class="qrc-name">LALIGURAS</div>
+        <div class="qrc-deva">लालीगुराँस</div>
+        <div class="qrc-kr">라리구라스</div>
+        <div class="qrc-sub">NEPALI · INDIAN · CUISINE</div>
+        <div class="qrc-sub-kr">네팔 · 인도 · 화성 · EST. 2015</div>
+        <div class="qrc-qr">
+          <canvas id="cardQRCanvas"></canvas>
+        </div>
+        <div class="qrc-bottom">Point your camera at the QR</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="downloadCardBtn">Download PNG (A6, 300 DPI)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <h2>Tips for printing</h2>
+    <ul style="font-size: 13px; line-height: 1.7; color: var(--ink-soft); padding-left: 20px;">
+      <li><strong>Size</strong>: Print the QR at least 3×3 cm so phone cameras can focus easily.</li>
+      <li><strong>Material</strong>: Matte laminate scans better than glossy. Ask your 인쇄소 for "무광 코팅".</li>
+      <li><strong>Placement</strong>: Eye level on the table, not flat against a window or under glass.</li>
+      <li><strong>Testing</strong>: After printing, scan with both an iPhone and an Android before placing on tables.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Active URL</h2>
+    <div class="url-box" id="urlDisplay">—</div>
+    <div class="actions" style="justify-content: flex-start;">
+      <a class="btn" id="testUrlBtn" href="#" target="_blank">Test in new tab →</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const cfg = window.LALIGURAS_CONFIG || {};
+  const DEFAULT_URL = cfg.MENU_URL || 'https://manojsubedi.github.io/HwaseongLaliguras/';
+
+  const $ = (id) => document.getElementById(id);
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  $('menuUrl').value = DEFAULT_URL;
+
+  async function generateQR() {
+    const url = $('menuUrl').value.trim();
+    if (!url) { showToast('Enter a URL first'); return; }
+
+    const color = $('qrColor').value;
+    const size = Number($('qrSize').value);
+
+    const opts = {
+      errorCorrectionLevel: 'H',
+      margin: 2,
+      width: size,
+      color: { dark: color, light: '#FFFFFF' }
+    };
+
+    // Plain QR on canvas
+    await QRCode.toCanvas($('plainQRCanvas'), url, opts);
+
+    // Smaller QR for the card
+    await QRCode.toCanvas($('cardQRCanvas'), url, {
+      ...opts,
+      width: 400,
+      margin: 1
+    });
+
+    $('urlDisplay').textContent = url;
+    $('testUrlBtn').href = url;
+  }
+
+  $('generateBtn').addEventListener('click', generateQR);
+  $('qrColor').addEventListener('change', generateQR);
+  $('qrSize').addEventListener('change', generateQR);
+  $('menuUrl').addEventListener('input', () => {
+    $('urlDisplay').textContent = $('menuUrl').value || '—';
+    $('testUrlBtn').href = $('menuUrl').value || '#';
+  });
+
+  // Download plain QR
+  $('downloadPlainBtn').addEventListener('click', () => {
+    const canvas = $('plainQRCanvas');
+    const link = document.createElement('a');
+    link.download = 'Laliguras_QR.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Downloaded');
+  });
+
+  // Copy URL
+  $('copyUrlBtn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText($('menuUrl').value);
+      showToast('URL copied');
+    } catch {
+      showToast('Copy failed — select and copy manually');
+    }
+  });
+
+  // Download branded card — render preview to image at print resolution
+  $('downloadCardBtn').addEventListener('click', async () => {
+    showToast('Generating print-ready card…');
+    const url = $('menuUrl').value.trim();
+    const color = $('qrColor').value;
+
+    // A6 at 300 DPI
+    const W = 1240, H = 1748;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+
+    // Outer border
+    ctx.strokeStyle = '#E5E5E2'; ctx.lineWidth = 2;
+    ctx.strokeRect(60, 60, W-120, H-120);
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 1;
+    ctx.strokeRect(74, 74, W-148, H-148);
+
+    // Helper: center text
+    const centerText = (y, text, font, color, spacing = 0) => {
+      ctx.font = font; ctx.fillStyle = color;
+      if (spacing) {
+        const chars = text.split('');
+        const widths = chars.map(c => ctx.measureText(c).width);
+        const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+        let x = (W - total) / 2;
+        chars.forEach((c, i) => {
+          ctx.fillText(c, x, y);
+          x += widths[i] + spacing;
+        });
+      } else {
+        const w = ctx.measureText(text).width;
+        ctx.fillText(text, (W - w) / 2, y);
+      }
+    };
+
+    // Logo
+    const logoImg = new Image(); logoImg.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      logoImg.onload = resolve;
+      logoImg.onerror = reject;
+      logoImg.src = 'logo.png';
+    });
+
+    // Logo shadow halo
+    ctx.save();
+    ctx.shadowColor = 'rgba(139,26,26,0.3)';
+    ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+    ctx.beginPath();
+    ctx.arc(W/2, 295, 160, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.restore();
+
+    // Clip logo to circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(W/2, 295, 160, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(logoImg, W/2 - 160, 135, 320, 320);
+    ctx.restore();
+
+    // Border around logo
+    ctx.strokeStyle = '#E5E5E2'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(W/2, 295, 160, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // SCAN tagline
+    centerText(135, 'SCAN  ·  VIEW  ·  ENJOY', 'bold 26px Inter, sans-serif', '#C9A227', 8);
+    centerText(175, '메뉴를 보려면 QR을 스캔하세요', '20px Noto Sans KR, sans-serif', '#6B6B6B');
+
+    // Brand name
+    centerText(560, 'LALIGURAS', 'bold 76px Fraunces, serif', '#B91C2C', 4);
+    centerText(630, 'लालीगुराँस', '36px Tiro Devanagari Hindi, serif', '#C9A227');
+    centerText(680, '라리구라스', 'bold 32px Noto Sans KR, sans-serif', '#383838', 4);
+
+    // Decorative line
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 80, 715); ctx.lineTo(W/2 - 20, 715); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W/2 + 20, 715); ctx.lineTo(W/2 + 80, 715); ctx.stroke();
+    ctx.fillStyle = '#C9A227';
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 8, 715); ctx.lineTo(W/2, 710); ctx.lineTo(W/2 + 8, 715); ctx.lineTo(W/2, 720);
+    ctx.closePath(); ctx.fill();
+
+    centerText(745, 'NEPALI · INDIAN · CUISINE', 'bold 24px Inter, sans-serif', '#383838', 3);
+    centerText(785, '네팔 · 인도 요리 · 화성 · EST. 2015', '20px Noto Sans KR, sans-serif', '#6B6B6B');
+
+    // QR
+    const qrCanvas = document.createElement('canvas');
+    await QRCode.toCanvas(qrCanvas, url, {
+      errorCorrectionLevel: 'H',
+      margin: 2,
+      width: 540,
+      color: { dark: color, light: '#FFFFFF' }
+    });
+    const qrX = (W - 540) / 2;
+    const qrY = 830;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(qrX - 20, qrY - 20, 580, 580);
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 1;
+    ctx.strokeRect(qrX - 20, qrY - 20, 580, 580);
+    ctx.drawImage(qrCanvas, qrX, qrY);
+
+    // Instructions
+    centerText(1450, 'Point your phone camera at the QR', 'italic 26px Fraunces, serif', '#383838');
+    centerText(1490, '휴대폰 카메라로 QR을 스캔하세요', '20px Noto Sans KR, sans-serif', '#6B6B6B');
+
+    // Bottom thanks
+    centerText(1560, 'धन्यवाद', '54px Tiro Devanagari Hindi, serif', '#B91C2C');
+    centerText(1620, 'THANK YOU', 'bold 22px Inter, sans-serif', '#C9A227', 6);
+    centerText(1660, '감사합니다', 'bold 24px Noto Sans KR, sans-serif', '#383838', 4);
+
+    // Download
+    const link = document.createElement('a');
+    link.download = 'Laliguras_QR_TableCard.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Card downloaded — 105×148mm @ 300 DPI');
+  });
+
+  // Boot
+  generateQR();
+</script>
+
+</body>
+</html>
