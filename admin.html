@@ -570,7 +570,7 @@
     throw new Error('Config missing');
   }
 
-  const supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   // ============ STATE ============
   let SECTIONS = [];
@@ -596,7 +596,7 @@
 
   // ============ AUTH ============
   async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) showApp();
     else showLogin();
   }
@@ -615,7 +615,7 @@
     e.preventDefault();
     $('loginAlert').innerHTML = '';
     showLoading();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabaseClient.auth.signInWithPassword({
       email: $('loginEmail').value,
       password: $('loginPassword').value
     });
@@ -628,7 +628,7 @@
   });
 
   $('signOutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     showLogin();
   });
 
@@ -637,8 +637,8 @@
     showLoading();
     try {
       const [{ data: sec, error: sErr }, { data: it, error: iErr }] = await Promise.all([
-        supabase.from('sections').select('*').order('sort_order'),
-        supabase.from('items').select('*').order('sort_order')
+        supabaseClient.from('sections').select('*').order('sort_order'),
+        supabaseClient.from('items').select('*').order('sort_order')
       ]);
       if (sErr) throw sErr;
       if (iErr) throw iErr;
@@ -812,14 +812,14 @@
     showLoading();
     try {
       if (id) {
-        const { error } = await supabase.from('items').update(payload).eq('id', id);
+        const { error } = await supabaseClient.from('items').update(payload).eq('id', id);
         if (error) throw error;
         showToast('Item updated', 'success');
       } else {
         // Calculate next sort order
         const existing = ITEMS.filter(i => i.section_id === payload.section_id);
         payload.sort_order = existing.length ? Math.max(...existing.map(i => i.sort_order)) + 10 : 10;
-        const { error } = await supabase.from('items').insert(payload);
+        const { error } = await supabaseClient.from('items').insert(payload);
         if (error) throw error;
         showToast('Item added', 'success');
       }
@@ -837,7 +837,7 @@
     const id = $('itemId').value;
     showLoading();
     try {
-      const { error } = await supabase.from('items').delete().eq('id', id);
+      const { error } = await supabaseClient.from('items').delete().eq('id', id);
       if (error) throw error;
       showToast('Item deleted', 'success');
       closeItemModal();
@@ -912,7 +912,7 @@
     }
     showLoading();
     try {
-      const { error } = await supabase.from('sections').delete().eq('id', id);
+      const { error } = await supabaseClient.from('sections').delete().eq('id', id);
       if (error) throw error;
       showToast('Section deleted', 'success');
       await loadData();
@@ -941,11 +941,11 @@
     showLoading();
     try {
       if (id) {
-        const { error } = await supabase.from('sections').update(payload).eq('id', id);
+        const { error } = await supabaseClient.from('sections').update(payload).eq('id', id);
         if (error) throw error;
         showToast('Section updated', 'success');
       } else {
-        const { error } = await supabase.from('sections').insert(payload);
+        const { error } = await supabaseClient.from('sections').insert(payload);
         if (error) throw error;
         showToast('Section added', 'success');
       }

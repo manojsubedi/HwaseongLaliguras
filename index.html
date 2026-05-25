@@ -396,7 +396,7 @@
 <script>
   // ============ LOAD MENU FROM SUPABASE ============
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.LALIGURAS_CONFIG || {};
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function fmtPrice(p) {
     return new Intl.NumberFormat('en-US').format(p);
@@ -449,8 +449,8 @@
     try {
       // Fetch sections + items
       const [{ data: sections, error: sErr }, { data: items, error: iErr }] = await Promise.all([
-        supabase.from('sections').select('*').order('sort_order'),
-        supabase.from('items').select('*').eq('available', true).order('sort_order')
+        supabaseClient.from('sections').select('*').order('sort_order'),
+        supabaseClient.from('items').select('*').eq('available', true).order('sort_order')
       ]);
 
       if (sErr) throw sErr;
