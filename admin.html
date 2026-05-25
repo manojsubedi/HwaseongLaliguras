@@ -688,6 +688,16 @@
     throw new Error('Config missing');
   }
 
+  if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
+    document.body.innerHTML = `
+      <div style="padding: 40px; max-width: 500px; margin: 60px auto; font-family: Inter, sans-serif;">
+        <h1 style="color: #B91C2C; margin-bottom: 12px;">Library failed to load</h1>
+        <p>The Supabase library could not load from the CDN. Check your internet connection or refresh the page.</p>
+        <p style="margin-top: 12px; font-size: 13px; color: #666;">If you have an ad blocker enabled, try disabling it for this site.</p>
+      </div>`;
+    throw new Error('Supabase library missing');
+  }
+
   const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   // ============ STATE ============

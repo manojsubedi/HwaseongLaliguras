@@ -417,6 +417,18 @@
 <script>
   // ============ LOAD MENU FROM SUPABASE ============
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.LALIGURAS_CONFIG || {};
+
+  if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
+    document.getElementById('menuMain').innerHTML = `
+      <div class="loading">
+        <div class="loading-text" style="color: var(--brand-red); text-align: center; padding: 20px;">
+          Could not load menu library.<br>Please check your internet and refresh.
+        </div>
+      </div>
+    `;
+    throw new Error('Supabase library missing');
+  }
+
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function fmtPrice(p) {
