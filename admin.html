@@ -915,11 +915,11 @@
     const wrap = $('imageUpload');
     $('itemImageUrl').value = url || '';
     if (url) {
-      $('imagePreview').querySelector('img').src = url;
+      $('imagePreview').src = url;
       wrap.classList.add('has-image');
     } else {
       wrap.classList.remove('has-image');
-      $('imagePreview').querySelector('img').src = '';
+      $('imagePreview').src = '';
     }
   }
 
