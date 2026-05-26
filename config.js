@@ -23,5 +23,5 @@ window.LALIGURAS_CONFIG = {
   ESTABLISHED: 2015,
 
   // The base URL where the menu is hosted (used by QR generator)
-  MENU_URL: 'https://manojsubedi.github.io/HwaseongLaliguras/'
+  MENU_URL:'https://hwaseong-laliguras.vercel.app/'
 };
