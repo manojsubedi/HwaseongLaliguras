@@ -13,7 +13,7 @@ window.LALIGURAS_CONFIG = {
   SUPABASE_URL: 'https://YOUR-PROJECT-REF.supabase.co',
 
   // Find at: Project Settings → API → Project API keys → anon public
-  SUPABASE_ANON_KEY: 'YOUR-ANON-PUBLIC-KEY-HERE',
+  SUPABASE_ANON_KEY: 'sb_publishable_hOWjqEghaSlpKI3fKNouzw_QSQb2g8o',
 
   // Restaurant settings
   RESTAURANT_NAME: 'Laliguras',
