@@ -1,0 +1,12 @@
+# Local backups produced by helper scripts
+*.old.png
+*.old.pdf
+*.old.jpg
+*.old.jpeg
+logo.old.png
+
+# Node toolchain (puppeteer-core etc. — installed locally to run scripts/)
+node_modules/
+
+# Scratch output from scripts
+scripts/_*

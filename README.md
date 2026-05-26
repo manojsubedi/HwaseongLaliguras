@@ -1,7 +1,7 @@
 # Laliguras Restaurant — Hwaseong
-## लालीगुराँस फारान · 라리구라스
+## लालीगुराँस हाफतोक · 라리구라스
 
-Authentic Nepali & Indian cuisine in Hwaseong, established 2015.
+Authentic Nepali & Indian cuisine in Hwaseong, established 2026.
 
 🌐 **Live menu:** [manojsubedi.github.io/HwaseongLaliguras](https://manojsubedi.github.io/HwaseongLaliguras/)
 
@@ -44,4 +44,4 @@ Typography: Fraunces (serif headings) + Inter (sans) + Noto Sans KR + Tiro Devan
 
 ---
 
-© Laliguras Restaurant · est. 2015 · Hwaseong
+© Laliguras Restaurant · est. 2026 · Hwaseong

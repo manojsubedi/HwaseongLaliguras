@@ -1,0 +1,23 @@
+{
+  "name": "hwaseonglaliguras",
+  "version": "1.0.0",
+  "description": "Authentic Nepali & Indian cuisine in Hwaseong, established 2026.",
+  "main": "config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manojsubedi/HwaseongLaliguras.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manojsubedi/HwaseongLaliguras/issues"
+  },
+  "homepage": "https://github.com/manojsubedi/HwaseongLaliguras#readme",
+  "dependencies": {
+    "puppeteer-core": "^25.1.0"
+  }
+}
