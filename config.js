@@ -10,10 +10,10 @@
 
 window.LALIGURAS_CONFIG = {
   // Find at: Project Settings → API → Project URL
-  SUPABASE_URL: 'https://qglmbwjghcienyssltmf.supabase.co',
+  SUPABASE_URL: 'https://YOUR-PROJECT-REF.supabase.co',
 
   // Find at: Project Settings → API → Project API keys → anon public
-  SUPABASE_ANON_KEY: 'sb_publishable_hOWjqEghaSlpKI3fKNouzw_QSQb2g8o',
+  SUPABASE_ANON_KEY: 'YOUR-ANON-PUBLIC-KEY-HERE',
 
   // Restaurant settings
   RESTAURANT_NAME: 'Laliguras',
@@ -23,5 +23,5 @@ window.LALIGURAS_CONFIG = {
   ESTABLISHED: 2015,
 
   // The base URL where the menu is hosted (used by QR generator)
-  MENU_URL:'https://hwaseong-laliguras.vercel.app/'
+  MENU_URL: 'https://hwaseong-laliguras.vercel.app/'
 };
