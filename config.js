@@ -10,7 +10,7 @@
 
 window.LALIGURAS_CONFIG = {
   // Find at: Project Settings → API → Project URL
-  SUPABASE_URL: 'https://YOUR-PROJECT-REF.supabase.co',
+  SUPABASE_URL: 'https://qglmbwjghcienyssltmf.supabase.co',
 
   // Find at: Project Settings → API → Project API keys → anon public
   SUPABASE_ANON_KEY: 'sb_publishable_hOWjqEghaSlpKI3fKNouzw_QSQb2g8o',
