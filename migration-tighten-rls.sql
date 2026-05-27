@@ -50,7 +50,7 @@ grant execute on function public.is_admin() to anon, authenticated;
 -- EDIT the email below to your admin login email, then this picks up its UID.
 insert into public.admins (user_id, email)
 select id, email from auth.users
-where email = 'manojs@gmeremit.com'      -- TODO: set to YOUR admin login email
+where email = 'subedi.msmanoj@gmail.com'   -- admin login email
 on conflict (user_id) do nothing;
 
 -- Lockout guard: warn loudly if the allowlist ended up empty.
