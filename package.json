@@ -4,7 +4,8 @@
   "description": "Authentic Nepali & Indian cuisine in Hwaseong, established 2026.",
   "main": "config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node scripts/minify.js",
+    "test": "node scripts/test_gallery.js && node scripts/test_admin_images.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,8 @@
   "homepage": "https://github.com/manojsubedi/HwaseongLaliguras#readme",
   "dependencies": {
     "puppeteer-core": "^25.1.0"
+  },
+  "devDependencies": {
+    "terser": "^5.48.0"
   }
 }

@@ -33,6 +33,28 @@ See `SETUP_GUIDE.md` for the full walkthrough (15 minutes).
 See `DEVELOPMENT_GUIDE.md` — the design system, conventions, and recipes for adding fields,
 photos, and components so they match the rest of the project.
 
+## 🔒 Code protection (deterrent)
+
+The public pages disable right-click, text selection, image-drag, and the common
+view-source/devtools shortcuts. This **only deters casual copying** — client-side code is always
+readable via the browser cache/network tab or with JS disabled. Real secrets stay server-side
+(Supabase); only the safe anon key is in `config.js`.
+
+For a stronger deterrent, build minified + mangled copies:
+
+```
+npm install      # one-time
+npm run build     # → dist/  (deploy this folder instead of the root files)
+```
+
+Source files stay readable; edit them and re-run `npm run build`. `dist/` is git-ignored.
+
+## ✅ Tests
+
+```
+npm test          # headless puppeteer checks: gallery, lightbox, admin image manager
+```
+
 ## 🔄 Updating the menu
 
 Sign into `/admin.html` with your Supabase credentials and edit items directly. Changes appear on the customer menu within 1-2 minutes.

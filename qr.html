@@ -29,6 +29,10 @@
     --line: #E5E5E2;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Casual-copy deterrent (deterrent only — keep form fields editable) */
+  html { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+  input, textarea { -webkit-user-select: text; user-select: text; }
+  img { -webkit-user-drag: none; user-drag: none; }
   body {
     background: var(--bg); color: var(--ink);
     font-family: 'Inter', 'Noto Sans KR', sans-serif;
@@ -567,6 +571,25 @@
   }
 
   bootWhenReady();
+</script>
+
+<script>
+  // ============ CASUAL-COPY DETERRENTS ============
+  // Deterrent only (browser code is always readable via cache/network/JS-off).
+  // Form fields stay fully usable so the URL can still be edited & copied.
+  (function () {
+    const inField = (e) => e.target && e.target.closest && e.target.closest('input, textarea, [contenteditable]');
+    const block = (e) => e.preventDefault();
+    document.addEventListener('contextmenu', (e) => { if (!inField(e)) block(e); });
+    ['selectstart', 'copy', 'cut', 'dragstart'].forEach((t) =>
+      document.addEventListener(t, (e) => { if (!inField(e)) block(e); }));
+    document.addEventListener('keydown', (e) => {
+      const k = (e.key || '').toLowerCase();
+      if (e.key === 'F12') return block(e);
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(k)) return block(e);
+      if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) return block(e);
+    });
+  })();
 </script>
 
 </body>
