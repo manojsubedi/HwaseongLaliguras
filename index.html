@@ -56,6 +56,11 @@
   body > * { position: relative; z-index: 1; }
   ::selection { background: var(--brand-red); color: #fff; }
 
+  /* Casual-copy deterrents: disable text selection + image dragging.
+     (Note: client-side code can't be fully hidden — this is a deterrent only.) */
+  html { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+  img { -webkit-user-drag: none; user-drag: none; }
+
   /* Remove 300ms tap delay; show clear keyboard focus */
   a, button { touch-action: manipulation; }
   :where(a, button):focus-visible {
@@ -954,6 +959,28 @@
   } else {
     loadMenu();
   }
+</script>
+
+<script>
+  // ============ CASUAL-COPY DETERRENTS ============
+  // Discourages right-click "Save/View source", text copy, image drag-save,
+  // and the common view-source / devtools shortcuts. This is NOT real
+  // protection — any page sent to a browser can still be read via the network
+  // tab, cache, or with JS disabled. It only deters casual copying.
+  (function () {
+    const block = (e) => e.preventDefault();
+    document.addEventListener('contextmenu', block);
+    document.addEventListener('selectstart', block);
+    document.addEventListener('copy', block);
+    document.addEventListener('cut', block);
+    document.addEventListener('dragstart', block);
+    document.addEventListener('keydown', (e) => {
+      const k = (e.key || '').toLowerCase();
+      if (e.key === 'F12') return block(e);                                  // devtools
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(k)) return block(e); // inspector
+      if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) return block(e); // view-source / save
+    });
+  })();
 </script>
 
 </body>
