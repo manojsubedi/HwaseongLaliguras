@@ -173,9 +173,15 @@ values (alt text etc.). Don't drop raw values into attributes.
 
 - `config.js` holds only the **anon/public** key — safe to commit. **Never** put the
   `service_role` key in client code.
-- Public users can **read** menu data and **read** photos. Only authenticated admins can write
-  (enforced by Row-Level Security + storage policies, not by the UI). Don't rely on hiding a
-  button for security.
+- Public users can **read** menu data (sections + `available` items) and **read** photos.
+  Verified: the anon key cannot insert/update/delete (RLS returns 0 rows). Don't rely on
+  hiding a button for security — RLS is the real boundary.
+- **Writes are limited to an admin allowlist.** `migration-tighten-rls.sql` adds a `public.admins`
+  table and an `is_admin()` (SECURITY DEFINER) helper; all write policies on `sections`, `items`,
+  and the `menu-photos` bucket require `is_admin()`. Being merely authenticated is not enough —
+  the user's `auth.uid()` must be in `admins`. To grant access, insert the user's UID into
+  `admins` (via the SQL Editor, which bypasses RLS). Also turn OFF email self-sign-up in
+  Dashboard → Authentication → Providers so strangers can't register.
 - After any DDL, `notify pgrst, 'reload schema';` so the REST API picks up the change.
 
 ---
