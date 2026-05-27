@@ -48,6 +48,22 @@
   }
   button, input, select, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
+  a, button { touch-action: manipulation; }
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  /* Icon buttons size their SVG consistently */
+  .btn svg { width: 1em; height: 1em; flex-shrink: 0; }
+  .btn-icon svg, .sidebar-toggle svg { width: 18px; height: 18px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
 
   /* ============ LOGIN ============ */
   .login-shell {
@@ -293,6 +309,11 @@
     .content-head h1 { font-size: 22px; }
     .search { min-width: 0; width: 100%; }
     .content-actions { width: 100%; }
+    /* Comfortable touch targets on phones */
+    .btn { min-height: 44px; }
+    .btn-icon { min-width: 44px; }
+    .section-link { min-height: 44px; }
+    .item-actions .btn-sm { min-height: 40px; padding: 8px 14px; }
   }
 
   /* Items table */
@@ -304,10 +325,15 @@
     border-radius: 10px; padding: 14px 16px;
     display: grid;
     grid-template-columns: auto 1fr auto auto auto;
-    align-items: center; gap: 12px;
-    transition: border-color 0.15s ease;
+    align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
   }
-  .item-row:hover { border-color: var(--ink-faint); }
+  .item-row:hover {
+    border-color: var(--ink-faint);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+  }
+  .item-row:active { transform: translateY(0) scale(0.997); }
   .item-row.unavail { opacity: 0.55; background: var(--line-soft); }
 
   .item-mark {
@@ -391,98 +417,112 @@
   .checkbox-row label { cursor: pointer; flex: 1; font-size: 13px; font-weight: 500; }
   .checkbox-row .hint { color: var(--ink-mute); font-size: 11px; font-weight: 400; }
 
-  /* ============ IMAGE UPLOAD ============ */
-  .image-upload {
+  /* ============ IMAGE MANAGER (multiple photos) ============ */
+  .image-manager {
     position: relative;
     border: 2px dashed var(--line);
     border-radius: 12px;
     background: var(--bg);
-    transition: all 0.2s ease;
-    overflow: hidden;
-    cursor: pointer;
+    padding: 12px;
+    transition: border-color 0.2s ease, background 0.2s ease;
   }
-  .image-upload:hover { border-color: var(--brand); background: var(--brand-soft); }
-  .image-upload.has-image {
-    border-style: solid;
-    cursor: default;
-    background: var(--surface);
-  }
-  .image-upload.dragging { border-color: var(--brand); background: var(--brand-soft); }
+  .image-manager.dragging { border-color: var(--brand); background: var(--brand-soft); }
+  .image-manager.has-images { border-style: solid; background: var(--surface); }
 
-  .image-upload-empty {
-    padding: 32px 20px;
-    text-align: center;
-    color: var(--ink-mute);
-  }
-  .image-upload.has-image .image-upload-empty { display: none; }
-
-  .image-upload-empty .icon {
-    font-size: 32px; margin-bottom: 8px; opacity: 0.5;
-  }
-  .image-upload-empty .primary {
-    font-weight: 600; color: var(--ink-soft); margin-bottom: 4px;
-  }
-  .image-upload-empty .hint {
-    font-size: 12px; color: var(--ink-mute);
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
   }
 
-  .image-preview {
-    display: none;
+  .image-tile {
     position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
     background: var(--bg);
-  }
-  .image-upload.has-image .image-preview { display: block; }
-  .image-preview img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
-  .image-actions {
-    position: absolute; top: 12px; right: 12px;
-    display: flex; gap: 6px;
-  }
-  .image-action-btn {
-    background: rgba(255,255,255,0.95);
     border: 1px solid var(--line);
-    color: var(--ink);
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 12px; font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: all 0.15s ease;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;  /* let pointer-based reorder own the gesture on touch */
+    transition: box-shadow 0.15s ease, transform 0.12s ease, opacity 0.12s ease;
   }
-  .image-action-btn:hover { background: var(--ink); color: #fff; }
-  .image-action-btn.danger:hover { background: var(--danger); }
+  .image-tile:active { cursor: grabbing; }
+  .image-tile img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 1; -webkit-user-drag: none; }
 
-  .image-upload-progress {
-    display: none;
-    position: absolute; inset: 0;
-    background: rgba(0,0,0,0.6); color: #fff;
-    align-items: center; justify-content: center;
-    flex-direction: column; gap: 8px;
-    font-size: 13px;
+  /* Loading shimmer until the photo loads */
+  .image-tile::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(100deg, var(--bg) 30%, #ECEBE6 50%, var(--bg) 70%);
+    background-size: 220% 100%; animation: shimmer 1.4s linear infinite;
   }
-  .image-upload.uploading .image-upload-progress { display: flex; }
-  .image-upload.uploading .image-upload-empty,
-  .image-upload.uploading .image-preview { opacity: 0.4; }
-  .upload-spinner {
-    width: 24px; height: 24px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+  .image-tile.loaded::after { display: none; }
+  @keyframes shimmer { from { background-position: 220% 0; } to { background-position: -220% 0; } }
+
+  /* Drag-to-reorder states */
+  .image-tile.dragging-tile { opacity: 0.4; cursor: grabbing; }
+  .image-tile.drag-over { box-shadow: 0 0 0 2px var(--brand); transform: scale(1.03); }
+
+  /* Cover (primary) badge on the first image */
+  .image-tile .cover-badge {
+    position: absolute; top: 6px; left: 6px; z-index: 2;
+    padding: 2px 7px; border-radius: 100px;
+    background: var(--brand); color: #fff;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; pointer-events: none;
+  }
+
+  /* Per-tile controls */
+  .tile-btn {
+    position: absolute; z-index: 2;
+    width: 26px; height: 26px;
+    border: none; border-radius: 50%;
+    background: rgba(22,22,22,0.78); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .tile-btn:active { transform: scale(0.9); }
+  .tile-btn svg { width: 14px; height: 14px; }
+  .tile-remove { top: 6px; right: 6px; }
+  .tile-remove:hover { background: var(--danger); }
+  .tile-cover { bottom: 6px; right: 6px; background: rgba(255,255,255,0.92); color: var(--ink); }
+  .tile-cover:hover { background: var(--brand); color: #fff; }
+
+  /* Add tile (also the drop zone) */
+  .image-add {
+    aspect-ratio: 1 / 1;
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    color: var(--ink-mute); cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    text-align: center; padding: 8px;
+  }
+  .image-add:hover { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); }
+  .image-add .icon { line-height: 0; }
+  .image-add .icon svg { width: 26px; height: 26px; }
+  .image-add .label { font-size: 11px; font-weight: 600; }
+
+  .image-manager-hint {
+    margin-top: 10px; font-size: 11px; color: var(--ink-mute);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .image-manager.uploading .image-manager-hint { color: var(--brand); font-weight: 600; }
+  .mini-spinner {
+    width: 13px; height: 13px;
+    border: 2px solid var(--line);
+    border-top-color: var(--brand);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+    display: none;
   }
+  .image-manager.uploading .mini-spinner { display: inline-block; }
 
-  .image-upload input[type=file] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer;
-    width: 100%; height: 100%;
-    font-size: 0;
-  }
-  .image-upload.has-image input[type=file] {
-    pointer-events: none;
-  }
+  .image-manager input[type=file] { display: none; }
 
   /* Toast */
   .toast {
@@ -511,21 +551,40 @@
 
   /* Stats */
   .stats {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
     gap: 12px; margin-bottom: 24px;
   }
   .stat {
+    position: relative;
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; padding: 14px 16px;
+    border-radius: 10px; padding: 14px 16px 14px 18px;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
+  .stat:hover { border-color: var(--ink-faint); box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+  /* Accent strip on the left edge — color carries meaning, label carries it too */
+  .stat::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--accent, var(--line));
+  }
+  .stat.red    { --accent: var(--brand); }
+  .stat.green  { --accent: var(--green); }
+  .stat.gold   { --accent: var(--gold); }
+  .stat.blue   { --accent: var(--blue); }
   .stat .label {
     font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--ink-mute); margin-bottom: 4px;
   }
   .stat .value {
-    font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700;
+    font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700;
+    line-height: 1; font-variant-numeric: tabular-nums;
   }
-  .stat .value.muted { color: var(--ink-mute); }
+  .stat .value.muted { color: var(--ink-faint); }
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat { padding: 12px 12px 12px 15px; }
+    .stat .value { font-size: 20px; }
+  }
 
   /* Loading */
   .loading-overlay {
@@ -580,7 +639,7 @@
 <div class="app" id="app">
   <div class="topbar">
     <div class="topbar-brand">
-      <button class="btn btn-sm btn-ghost sidebar-toggle" id="sidebarToggle" aria-label="Toggle sections menu">☰</button>
+      <button class="btn btn-sm btn-ghost sidebar-toggle" id="sidebarToggle" aria-label="Toggle sections menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <img src="logo.png" alt="">
       <div>
         <div class="name">Laliguras</div>
@@ -617,6 +676,8 @@
         </div>
       </div>
 
+      <div class="stats" id="statsBar"></div>
+
       <div class="items-grid" id="itemsList"></div>
     </main>
   </div>
@@ -627,7 +688,7 @@
   <div class="modal">
     <div class="modal-head">
       <h2 id="itemModalTitle">Add Item</h2>
-      <button class="btn btn-icon btn-ghost" onclick="closeItemModal()">✕</button>
+      <button class="btn btn-icon btn-ghost" onclick="closeItemModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <form id="itemForm">
@@ -638,29 +699,23 @@
           <select id="itemSection" required></select>
         </div>
 
-        <!-- Image upload -->
+        <!-- Image manager (multiple photos) -->
         <div class="field">
-          <label>Photo <span style="color: var(--ink-mute); font-weight: 400; text-transform: none; letter-spacing: 0;">(optional, max 5MB)</span></label>
-          <div class="image-upload" id="imageUpload">
-            <div class="image-upload-empty">
-              <div class="icon">📷</div>
-              <div class="primary">Tap to upload photo</div>
-              <div class="hint">JPG, PNG or WebP · best size: 1200×900</div>
+          <label>Photos <span style="color: var(--ink-mute); font-weight: 400; text-transform: none; letter-spacing: 0;">(optional · add several · max 5MB each)</span></label>
+          <div class="image-manager" id="imageManager">
+            <div class="image-grid" id="imageGrid">
+              <!-- tiles injected by JS; add-tile is always last -->
+              <button type="button" class="image-add" id="addImageTile">
+                <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>
+                <span class="label">Add photo</span>
+              </button>
             </div>
-            <div class="image-preview">
-              <img id="imagePreview" alt="">
-              <div class="image-actions">
-                <button type="button" class="image-action-btn" id="changeImageBtn">Change</button>
-                <button type="button" class="image-action-btn danger" id="removeImageBtn">Remove</button>
-              </div>
+            <div class="image-manager-hint">
+              <span class="mini-spinner"></span>
+              <span id="imageManagerHint">JPG, PNG or WebP · drag tiles to reorder · first photo is the cover</span>
             </div>
-            <div class="image-upload-progress">
-              <div class="upload-spinner"></div>
-              <div id="uploadProgressText">Uploading…</div>
-            </div>
-            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp">
+            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp" multiple>
           </div>
-          <input type="hidden" id="itemImageUrl">
         </div>
 
         <div class="row cols-2">
@@ -729,7 +784,7 @@
   <div class="modal">
     <div class="modal-head">
       <h2>Manage Sections</h2>
-      <button class="btn btn-icon btn-ghost" onclick="closeSectionModal()">✕</button>
+      <button class="btn btn-icon btn-ghost" onclick="closeSectionModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div id="sectionsList" style="margin-bottom: 16px;"></div>
@@ -823,6 +878,7 @@
   let searchQuery = '';
   let editingItemId = null;
   let editingSectionId = null;
+  let currentImages = [];  // ordered list of photo URLs for the item being edited
 
   // Accent-color name (red|green|blue|gold) → CSS custom-property name
   const ACCENT_VAR = { red: '--brand', green: '--green', blue: '--blue', gold: '--gold' };
@@ -905,7 +961,37 @@
   function render() {
     renderSidebar();
     renderHeader();
+    renderStats();
     renderItems();
+  }
+
+  // Dashboard stat cards — reflect the currently selected section (or all).
+  function renderStats() {
+    const pool = currentSectionFilter === 'all'
+      ? ITEMS
+      : ITEMS.filter(i => i.section_id === currentSectionFilter);
+
+    const veg = pool.filter(i => i.is_veg).length;
+    const sig = pool.filter(i => i.is_signature).length;
+    const withPhoto = pool.filter(i => {
+      const n = Array.isArray(i.images) ? i.images.filter(Boolean).length : 0;
+      return n > 0 || !!i.image_url;
+    }).length;
+    const hidden = pool.filter(i => !i.available).length;
+
+    const card = (label, value, accent, muted) => `
+      <div class="stat ${accent || ''}">
+        <div class="label">${label}</div>
+        <div class="value${muted && !value ? ' muted' : ''}">${value}</div>
+      </div>`;
+
+    $('statsBar').innerHTML = [
+      card(currentSectionFilter === 'all' ? 'Total items' : 'Items', pool.length, ''),
+      card('Vegetarian', veg, 'green'),
+      card('Signature', sig, 'gold'),
+      card('With photos', withPhoto, 'blue'),
+      card('Hidden', hidden, 'red', true),
+    ].join('');
   }
 
   function renderSidebar() {
@@ -938,13 +1024,15 @@
   }
 
   function renderHeader() {
+    // Counts now live in the stat cards below — the meta line only surfaces
+    // the actionable "hidden" note (and the Korean section name for context).
     if (currentSectionFilter === 'all') {
-      const veg = ITEMS.filter(i => i.is_veg).length;
-      const sig = ITEMS.filter(i => i.is_signature).length;
       const hidden = ITEMS.filter(i => !i.available).length;
       $('contentEyebrow').textContent = 'All sections';
       $('contentTitle').textContent = 'Menu Items';
-      $('contentMeta').innerHTML = `${ITEMS.length} items · ${veg} veg · ${sig} signature${hidden ? ` · <span style="color: var(--brand);">${hidden} hidden</span>` : ''}`;
+      $('contentMeta').innerHTML = hidden
+        ? `<span style="color: var(--brand);">${hidden} item${hidden === 1 ? '' : 's'} hidden from customers</span>`
+        : 'Tap any item to edit · drag-free, saves instantly';
     } else {
       const s = SECTIONS.find(x => x.id === currentSectionFilter);
       if (!s) return;
@@ -952,7 +1040,10 @@
       const hidden = sectionItems.filter(i => !i.available).length;
       $('contentEyebrow').textContent = s.eyebrow || s.name_kr || 'Section';
       $('contentTitle').textContent = s.name_en;
-      $('contentMeta').innerHTML = `${sectionItems.length} item${sectionItems.length === 1 ? '' : 's'}${hidden ? ` · <span style="color: var(--brand);">${hidden} hidden</span>` : ''}`;
+      $('contentMeta').innerHTML = [
+        s.name_kr || '',
+        hidden ? `<span style="color: var(--brand);">${hidden} hidden</span>` : ''
+      ].filter(Boolean).join(' · ');
     }
   }
 
@@ -1014,8 +1105,13 @@
     const markCls = item.is_veg ? 'item-mark' : 'item-mark nv';
     const spice = item.spice_level ? `<span class="sp">${'●'.repeat(item.spice_level)}</span>` : '';
     const sig = item.is_signature ? '<span class="sig">★ SIG</span>' : '';
-    const thumb = item.image_url
-      ? `<img src="${item.image_url}" alt="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--line);">`
+    const photoCount = Array.isArray(item.images) ? item.images.filter(Boolean).length : (item.image_url ? 1 : 0);
+    const cover = item.image_url || (Array.isArray(item.images) ? item.images[0] : null);
+    const countBadge = photoCount > 1
+      ? `<span style="position:absolute; bottom:-4px; right:-4px; min-width:16px; height:16px; padding:0 4px; border-radius:8px; background:var(--brand); color:#fff; font-size:9px; font-weight:700; line-height:16px; text-align:center; box-shadow:0 0 0 2px var(--surface);">${photoCount}</span>`
+      : '';
+    const thumb = cover
+      ? `<div style="position:relative; flex-shrink:0;"><img src="${cover}" alt="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--line); display:block;">${countBadge}</div>`
       : `<div style="width: 40px; height: 40px; border-radius: 6px; border: 1px dashed var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 16px;">📷</div>`;
     return `
       <div class="item-row ${item.available ? '' : 'unavail'}" data-id="${item.id}">
@@ -1058,80 +1154,110 @@
       $('itemVeg').checked = item.is_veg;
       $('itemSignature').checked = item.is_signature;
       $('itemAvailable').checked = item.available;
-      // Image
-      setImagePreview(item.image_url);
+      // Images — prefer the array, fall back to the legacy single image_url
+      currentImages = (Array.isArray(item.images) ? item.images.filter(Boolean) : []);
+      if (currentImages.length === 0 && item.image_url) currentImages = [item.image_url];
+      renderImageGrid();
     } else {
       $('itemForm').reset();
       $('itemId').value = '';
       $('itemAvailable').checked = true;
       // Default to currently filtered section if any
       if (currentSectionFilter !== 'all') $('itemSection').value = currentSectionFilter;
-      // Reset image
-      setImagePreview(null);
+      // Reset images
+      currentImages = [];
+      renderImageGrid();
     }
 
     $('itemModal').classList.add('active');
   }
 
-  // ============ IMAGE UPLOAD ============
-  function setImagePreview(url) {
-    const wrap = $('imageUpload');
-    $('itemImageUrl').value = url || '';
-    if (url) {
-      $('imagePreview').src = url;
-      wrap.classList.add('has-image');
-    } else {
-      wrap.classList.remove('has-image');
-      $('imagePreview').src = '';
+  // ============ IMAGE MANAGER (multiple photos) ============
+  // Render the thumbnail grid from currentImages; the "add" tile is always last.
+  function renderImageGrid() {
+    const grid = $('imageGrid');
+    const manager = $('imageManager');
+    manager.classList.toggle('has-images', currentImages.length > 0);
+
+    const tiles = currentImages.map((url, i) => `
+      <div class="image-tile" data-i="${i}" draggable="true">
+        <img src="${url}" alt="Photo ${i + 1}" onload="this.parentElement.classList.add('loaded')" onerror="this.parentElement.classList.add('loaded')">
+        ${i === 0 ? '<span class="cover-badge">Cover</span>' : ''}
+        <button type="button" class="tile-btn tile-remove" data-action="remove" data-i="${i}" aria-label="Remove photo ${i + 1}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        ${i !== 0 ? `<button type="button" class="tile-btn tile-cover" data-action="cover" data-i="${i}" aria-label="Make photo ${i + 1} the cover" title="Set as cover">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.5 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>
+        </button>` : ''}
+      </div>
+    `).join('');
+
+    const addTile = `
+      <button type="button" class="image-add" id="addImageTile">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>
+        <span class="label">Add photo</span>
+      </button>`;
+
+    grid.innerHTML = tiles + addTile;
+  }
+
+  // Upload one file, returning its public URL (or throwing on failure).
+  async function uploadOne(file) {
+    if (file.size > 5 * 1024 * 1024) throw new Error('File too large (max 5MB)');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      throw new Error('Only JPG, PNG, or WebP images allowed');
+    }
+    const compressed = await compressImage(file);
+    const filename = `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const { error } = await supabaseClient.storage
+      .from('menu-photos')
+      .upload(filename, compressed, {
+        cacheControl: '31536000',
+        upsert: false,
+        contentType: compressed.type
+      });
+    if (error) throw error;
+    const { data: { publicUrl } } = supabaseClient.storage
+      .from('menu-photos')
+      .getPublicUrl(filename);
+    return publicUrl;
+  }
+
+  // Upload a list of files sequentially, appending each to currentImages.
+  async function uploadImages(fileList) {
+    const files = [...fileList];
+    if (files.length === 0) return;
+    const manager = $('imageManager');
+    const hint = $('imageManagerHint');
+    manager.classList.add('uploading');
+
+    let ok = 0;
+    try {
+      for (let i = 0; i < files.length; i++) {
+        hint.textContent = files.length > 1 ? `Uploading ${i + 1} of ${files.length}…` : 'Uploading…';
+        try {
+          const url = await uploadOne(files[i]);
+          currentImages.push(url);
+          renderImageGrid();
+          ok++;
+        } catch (err) {
+          showToast(`Skipped a photo: ${err.message}`, 'error');
+        }
+      }
+      if (ok > 0) showToast(ok > 1 ? `${ok} photos added` : 'Photo added', 'success');
+    } finally {
+      manager.classList.remove('uploading');
+      hint.textContent = 'JPG, PNG or WebP · drag tiles to reorder · first photo is the cover';
+      $('imageFile').value = '';
     }
   }
 
-  async function uploadImage(file) {
-    const wrap = $('imageUpload');
-    wrap.classList.add('uploading');
-    $('uploadProgressText').textContent = 'Uploading…';
-
+  // Best-effort delete of a removed photo from storage.
+  async function deleteFromStorage(url) {
     try {
-      // Validate file
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('File too large (max 5MB)');
-      }
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        throw new Error('Only JPG, PNG, or WebP images allowed');
-      }
-
-      // Compress/resize before upload (max 1600px wide, keeps file small)
-      const compressed = await compressImage(file);
-      $('uploadProgressText').textContent = 'Uploading…';
-
-      // Generate unique filename
-      const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-      const filename = `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-      // Upload to Supabase Storage
-      const { data, error } = await supabaseClient.storage
-        .from('menu-photos')
-        .upload(filename, compressed, {
-          cacheControl: '31536000',  // 1 year cache
-          upsert: false,
-          contentType: compressed.type
-        });
-
-      if (error) throw error;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabaseClient.storage
-        .from('menu-photos')
-        .getPublicUrl(filename);
-
-      setImagePreview(publicUrl);
-      showToast('Photo uploaded', 'success');
-    } catch (err) {
-      showToast(`Upload failed: ${err.message}`, 'error');
-    } finally {
-      wrap.classList.remove('uploading');
-      $('imageFile').value = '';  // reset file input
-    }
+      const path = (url || '').split('/menu-photos/')[1];
+      if (path) await supabaseClient.storage.from('menu-photos').remove([path]);
+    } catch (e) { /* ignore — orphaned files are harmless */ }
   }
 
   // Client-side resize: keeps Supabase storage small + faster uploads on mobile data
@@ -1160,49 +1286,144 @@
     });
   }
 
-  // Set up image upload handlers (once)
+  // Set up image-manager handlers (once)
   $('imageFile').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) uploadImage(file);
+    if (e.target.files.length) uploadImages(e.target.files);
   });
 
-  $('changeImageBtn').addEventListener('click', () => {
-    $('imageFile').click();
-  });
+  // The "Add photo" tile is re-rendered, so delegate clicks on the grid.
+  $('imageGrid').addEventListener('click', async (e) => {
+    const addBtn = e.target.closest('#addImageTile');
+    if (addBtn) { $('imageFile').click(); return; }
 
-  $('removeImageBtn').addEventListener('click', async () => {
-    const url = $('itemImageUrl').value;
-    if (url) {
-      // Try to delete from storage (best effort)
-      try {
-        const path = url.split('/menu-photos/')[1];
-        if (path) {
-          await supabaseClient.storage.from('menu-photos').remove([path]);
-        }
-      } catch (e) { /* ignore */ }
+    const btn = e.target.closest('.tile-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.i);
+
+    if (btn.dataset.action === 'remove') {
+      const [url] = currentImages.splice(i, 1);
+      renderImageGrid();
+      showToast('Photo removed', '');
+      deleteFromStorage(url);
+    } else if (btn.dataset.action === 'cover') {
+      // Move the chosen photo to the front (index 0 = cover)
+      const [url] = currentImages.splice(i, 1);
+      currentImages.unshift(url);
+      renderImageGrid();
+      showToast('Cover photo updated', 'success');
     }
-    setImagePreview(null);
-    showToast('Photo removed', '');
   });
 
-  // Drag and drop
+  // Dragging an external FILE onto the manager = upload. (Tile reordering is a
+  // separate internal drag handled below; we ignore it here via the Files check.)
+  const isFileDrag = (e) => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
   ['dragenter', 'dragover'].forEach(evt => {
-    $('imageUpload').addEventListener(evt, (e) => {
+    $('imageManager').addEventListener(evt, (e) => {
+      if (!isFileDrag(e)) return;
       e.preventDefault();
-      $('imageUpload').classList.add('dragging');
+      $('imageManager').classList.add('dragging');
     });
   });
   ['dragleave', 'drop'].forEach(evt => {
-    $('imageUpload').addEventListener(evt, (e) => {
-      e.preventDefault();
-      $('imageUpload').classList.remove('dragging');
-    });
+    $('imageManager').addEventListener(evt, () => $('imageManager').classList.remove('dragging'));
   });
-  $('imageUpload').addEventListener('drop', (e) => {
+  $('imageManager').addEventListener('drop', (e) => {
+    if (!isFileDrag(e)) return;  // tile-reorder drops are handled on the grid
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) uploadImage(file);
+    if (e.dataTransfer.files.length) uploadImages(e.dataTransfer.files);
   });
+
+  // Drag-to-reorder photo tiles (HTML5 DnD; pointer/desktop). The "Set as cover"
+  // star remains the touch-friendly way to promote a photo to first.
+  let dragIndex = null;
+  $('imageGrid').addEventListener('dragstart', (e) => {
+    const tile = e.target.closest('.image-tile');
+    if (!tile) return;
+    dragIndex = Number(tile.dataset.i);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(dragIndex));  // needed for Firefox
+    tile.classList.add('dragging-tile');
+  });
+  $('imageGrid').addEventListener('dragover', (e) => {
+    if (dragIndex === null) return;
+    const tile = e.target.closest('.image-tile');
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    $('imageGrid').querySelectorAll('.image-tile').forEach(t =>
+      t.classList.toggle('drag-over', t === tile && Number(t.dataset.i) !== dragIndex)
+    );
+  });
+  $('imageGrid').addEventListener('drop', (e) => {
+    if (dragIndex === null) return;
+    const tile = e.target.closest('.image-tile');
+    e.preventDefault();
+    e.stopPropagation();
+    if (tile) {
+      const to = Number(tile.dataset.i);
+      if (to !== dragIndex) {
+        const [moved] = currentImages.splice(dragIndex, 1);
+        currentImages.splice(to, 0, moved);
+        renderImageGrid();
+      }
+    }
+    dragIndex = null;
+  });
+  $('imageGrid').addEventListener('dragend', () => {
+    dragIndex = null;
+    $('imageGrid').querySelectorAll('.drag-over, .dragging-tile')
+      .forEach(t => t.classList.remove('drag-over', 'dragging-tile'));
+  });
+
+  // Touch / pen drag-to-reorder (native HTML5 DnD doesn't fire on touch).
+  // Mouse keeps using the DnD above; this path only handles touch & pen.
+  (function () {
+    const grid = $('imageGrid');
+    let active = false, moved = false, fromIdx = null, srcTile = null, startX = 0, startY = 0;
+
+    const clearMarks = () => grid.querySelectorAll('.drag-over, .dragging-tile')
+      .forEach(t => t.classList.remove('drag-over', 'dragging-tile'));
+
+    grid.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;            // mouse → native DnD
+      const tile = e.target.closest('.image-tile');
+      if (!tile || e.target.closest('.tile-btn')) return; // don't start on a control
+      active = true; moved = false;
+      fromIdx = Number(tile.dataset.i); srcTile = tile;
+      startX = e.clientX; startY = e.clientY;
+    });
+
+    grid.addEventListener('pointermove', (e) => {
+      if (!active) return;
+      if (!moved) {
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) < 8) return;  // threshold
+        moved = true;
+        srcTile.classList.add('dragging-tile');
+        try { grid.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const over = el && el.closest ? el.closest('.image-tile') : null;
+      grid.querySelectorAll('.image-tile').forEach(t =>
+        t.classList.toggle('drag-over', t === over && t !== srcTile));
+    });
+
+    const finish = (e) => {
+      if (!active) return;
+      if (moved) {
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const over = el && el.closest ? el.closest('.image-tile') : null;
+        if (over && over !== srcTile) {
+          const to = Number(over.dataset.i);
+          const [m] = currentImages.splice(fromIdx, 1);
+          currentImages.splice(to, 0, m);
+          renderImageGrid();
+        }
+      }
+      active = false; moved = false; fromIdx = null; srcTile = null;
+      clearMarks();
+    };
+    grid.addEventListener('pointerup', finish);
+    grid.addEventListener('pointercancel', finish);
+  })();
 
   function closeItemModal() {
     $('itemModal').classList.remove('active');
@@ -1227,7 +1448,8 @@
       is_veg: $('itemVeg').checked,
       is_signature: $('itemSignature').checked,
       available: $('itemAvailable').checked,
-      image_url: $('itemImageUrl').value || null,
+      images: currentImages,
+      image_url: currentImages[0] || null,  // keep primary in sync for legacy/fallback
     };
 
     showLoading();

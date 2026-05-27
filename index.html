@@ -56,6 +56,20 @@
   body > * { position: relative; z-index: 1; }
   ::selection { background: var(--brand-red); color: #fff; }
 
+  /* Remove 300ms tap delay; show clear keyboard focus */
+  a, button { touch-action: manipulation; }
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--brand-blue);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  /* Visually-hidden text for screen readers */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
   /* HERO */
   .hero {
     padding: var(--s-7) var(--s-5) var(--s-6);
@@ -155,6 +169,7 @@
   .tabs-inner::-webkit-scrollbar { display: none; }
   .tabs a {
     flex-shrink: 0; padding: 10px 14px;
+    display: inline-flex; align-items: center; min-height: 44px;
     font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
     letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--ink-mute); text-decoration: none;
@@ -220,6 +235,159 @@
     from { opacity: 0; transform: scale(1.02); }
     to { opacity: 1; transform: scale(1); }
   }
+
+  /* GALLERY (multiple photos — swipeable) */
+  .item-gallery {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: var(--s-4);
+    background: var(--paper-warm);
+  }
+  .gallery-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  .gallery-track::-webkit-scrollbar { display: none; }
+  .gallery-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+  .gallery-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.4s ease;
+  }
+  .gallery-slide img.loaded { animation: photoFadeIn 0.4s ease; }
+
+  /* Photo counter chip — signals "there's more to swipe" */
+  .gallery-count {
+    position: absolute; top: 10px; right: 10px;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 100px;
+    background: rgba(22, 22, 22, 0.55);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    color: #fff; font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em; pointer-events: none;
+  }
+  .gallery-count svg { width: 12px; height: 12px; opacity: 0.85; }
+
+  /* Dot indicators */
+  .gallery-dots {
+    position: absolute; left: 0; right: 0; bottom: 4px;
+    display: flex; justify-content: center; align-items: center; gap: 2px;
+  }
+  .gallery-dot {
+    -webkit-appearance: none; appearance: none;
+    border: 0; background: transparent;
+    padding: 9px 4px; margin: 0; cursor: pointer; line-height: 0;
+  }
+  .gallery-dot i {
+    display: block; width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    transition: width 0.25s ease, background 0.25s ease;
+  }
+  .gallery-dot.active i { width: 18px; border-radius: 4px; background: #fff; }
+
+  /* Arrows — desktop / fine-pointer only */
+  .gallery-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: rgba(255, 255, 255, 0.92); color: var(--ink);
+    display: none; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, opacity 0.2s ease;
+    z-index: 2;
+  }
+  .gallery-arrow:hover { background: #fff; }
+  .gallery-arrow.prev { left: 8px; }
+  .gallery-arrow.next { right: 8px; }
+  .gallery-arrow svg { width: 18px; height: 18px; }
+  @media (hover: hover) and (pointer: fine) {
+    .item-gallery:hover .gallery-arrow { display: inline-flex; }
+  }
+  .gallery-arrow[disabled] { opacity: 0.35; cursor: default; }
+
+  /* Tap-to-zoom affordance + loading shimmer */
+  .item-photo, .gallery-slide { position: relative; cursor: zoom-in; }
+  .item-photo::after, .gallery-slide::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(100deg, var(--paper-warm) 30%, #EEEDE7 50%, var(--paper-warm) 70%);
+    background-size: 220% 100%; animation: shimmer 1.4s linear infinite;
+  }
+  .item-photo.loaded::after, .gallery-slide.loaded::after { display: none; }
+  .item-photo img, .gallery-slide img { position: relative; z-index: 1; }
+  @keyframes shimmer { from { background-position: 220% 0; } to { background-position: -220% 0; } }
+  @media (hover: hover) and (pointer: fine) {
+    .item-photo img:hover, .gallery-slide img:hover { transform: scale(1.03); }
+  }
+
+  /* LIGHTBOX — full-screen photo viewer */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(12, 10, 10, 0.94);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .lightbox.open { display: flex; opacity: 1; }
+  .lb-stage {
+    max-width: 94vw; max-height: 82vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lb-stage img {
+    max-width: 94vw; max-height: 82vh;
+    width: auto; height: auto; object-fit: contain;
+    border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: lbPop 0.28s ease;
+  }
+  @keyframes lbPop { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+  .lb-close {
+    position: absolute; top: max(12px, env(safe-area-inset-top)); right: 14px;
+    width: 44px; height: 44px; border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.12); color: #fff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .lb-close:hover { background: rgba(255,255,255,0.25); }
+  .lb-close svg { width: 22px; height: 22px; }
+  .lb-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.12); color: #fff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .lb-arrow:hover { background: rgba(255,255,255,0.25); }
+  .lb-arrow svg { width: 26px; height: 26px; }
+  .lb-arrow.prev { left: 10px; }
+  .lb-arrow.next { right: 10px; }
+  .lb-arrow[hidden] { display: none; }
+  .lb-counter {
+    position: absolute; top: max(20px, calc(env(safe-area-inset-top) + 8px)); left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    color: rgba(255,255,255,0.85); letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-caption {
+    position: absolute; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0;
+    text-align: center; padding: 0 24px;
+    font-family: 'Fraunces', serif; font-size: 15px; font-style: italic;
+    color: rgba(255,255,255,0.92);
+  }
+
   .item-head {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: var(--s-3); margin-bottom: var(--s-1);
@@ -414,6 +582,15 @@
 
 <button class="back-top" id="backTop" aria-label="Back to top">↑</button>
 
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+  <div class="lb-counter"><span id="lbNow">1</span> / <span id="lbTotal">1</span></div>
+  <button class="lb-close" id="lbClose" aria-label="Close photo viewer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <button class="lb-arrow prev" id="lbPrev" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <div class="lb-stage"><img id="lbImg" alt=""></div>
+  <button class="lb-arrow next" id="lbNext" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
 <script>
   // ============ LOAD MENU FROM SUPABASE ============
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.LALIGURAS_CONFIG || {};
@@ -437,20 +614,57 @@
 
   function spiceMarks(level) {
     if (!level) return '';
-    return ` <span class="spice">${'●'.repeat(level)}</span>`;
+    const label = level >= 2 ? 'Spicy' : 'Mild spice';
+    return ` <span class="spice" role="img" aria-label="${label}">${'●'.repeat(level)}</span>`;
+  }
+
+  // Build the ordered photo list for an item, tolerant of older single-image rows.
+  function itemPhotos(item) {
+    let list = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+    if (list.length === 0 && item.image_url) list = [item.image_url];
+    return list;
+  }
+
+  function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function renderGallery(photos, name) {
+    const altName = escapeAttr(name);
+    if (photos.length === 0) return '';
+    if (photos.length === 1) {
+      return `<div class="item-photo"><img src="${photos[0]}" alt="${altName}" loading="lazy" onload="imgLoaded(this)"></div>`;
+    }
+    const slides = photos.map((url, i) =>
+      `<div class="gallery-slide"><img src="${url}" alt="${altName} — photo ${i + 1} of ${photos.length}" loading="lazy" onload="imgLoaded(this)"></div>`
+    ).join('');
+    const dots = photos.map((_, i) =>
+      `<button class="gallery-dot${i === 0 ? ' active' : ''}" data-i="${i}" aria-label="Show photo ${i + 1} of ${photos.length}"><i></i></button>`
+    ).join('');
+    return `
+      <div class="item-gallery" data-count="${photos.length}" role="group" aria-roledescription="carousel" aria-label="${altName} photos, swipe to browse">
+        <div class="gallery-track">${slides}</div>
+        <div class="gallery-count" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="gallery-count-now">1</span>/<span>${photos.length}</span>
+        </div>
+        <button class="gallery-arrow prev" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="gallery-arrow next" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <div class="gallery-dots">${dots}</div>
+      </div>`;
   }
 
   function renderItem(item) {
     const mark = item.is_veg ? 'mark' : 'mark nv';
+    const markLabel = item.is_veg ? 'Vegetarian' : 'Non-vegetarian';
     const featured = item.is_signature ? ' featured' : '';
-    const photo = item.image_url
-      ? `<div class="item-photo"><img src="${item.image_url}" alt="${item.name_en}" loading="lazy" onload="this.classList.add('loaded')"></div>`
-      : '';
+    const sigSr = item.is_signature ? '<span class="sr-only">Signature dish. </span>' : '';
+    const photo = renderGallery(itemPhotos(item), item.name_en);
     return `
-      <div class="item${featured}">
+      <div class="item${featured}" data-name="${escapeAttr(item.name_en)}">
         ${photo}
         <div class="item-head">
-          <span class="item-name"><span class="${mark}"></span>${item.name_en}${spiceMarks(item.spice_level)}</span>
+          <span class="item-name"><span class="${mark}" role="img" aria-label="${markLabel}"></span>${sigSr}${item.name_en}${spiceMarks(item.spice_level)}</span>
           <span class="item-price"><span class="currency">₩</span>${fmtPrice(item.price)}</span>
         </div>
         ${item.name_kr ? `<div class="item-name-kr">${item.name_kr}</div>` : ''}
@@ -513,8 +727,10 @@
 
       renderTabs(sections);
 
-      // Activate nav behavior
+      // Activate nav behavior + swipeable galleries + tap-to-zoom lightbox
       initNavBehavior();
+      initGalleries();
+      initLightbox();
     } catch (err) {
       console.error('Failed to load menu:', err);
       document.getElementById('menuMain').innerHTML = `
@@ -525,6 +741,153 @@
         </div>
       `;
     }
+  }
+
+  // Mark a photo (and its container) loaded so the shimmer placeholder hides.
+  function imgLoaded(img) {
+    img.classList.add('loaded');
+    const wrap = img.closest('.item-photo, .gallery-slide');
+    if (wrap) wrap.classList.add('loaded');
+  }
+
+  // ============ LIGHTBOX (full-screen photo viewer) ============
+  const lb = { photos: [], i: 0, trigger: null };
+
+  function lbRender() {
+    const total = lb.photos.length;
+    document.getElementById('lbImg').src = lb.photos[lb.i] || '';
+    document.getElementById('lbNow').textContent = String(lb.i + 1);
+    document.getElementById('lbTotal').textContent = String(total);
+    const counter = document.querySelector('.lb-counter');
+    if (counter) counter.style.display = total > 1 ? '' : 'none';
+    const prev = document.getElementById('lbPrev');
+    const next = document.getElementById('lbNext');
+    prev.hidden = next.hidden = total <= 1;
+    prev.disabled = lb.i === 0;
+    next.disabled = lb.i === total - 1;
+    prev.style.opacity = lb.i === 0 ? '0.3' : '';
+    next.style.opacity = lb.i === total - 1 ? '0.3' : '';
+  }
+
+  function openLightbox(photos, index, caption) {
+    if (!photos || photos.length === 0) return;
+    lb.photos = photos;
+    lb.i = Math.max(0, Math.min(photos.length - 1, index || 0));
+    lb.trigger = document.activeElement;
+    document.getElementById('lbCaption').textContent = caption || '';
+    document.getElementById('lbImg').alt = caption || 'Menu photo';
+    lbRender();
+    const el = document.getElementById('lightbox');
+    el.classList.add('open');
+    el.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('lbClose').focus();
+  }
+
+  function closeLightbox() {
+    const el = document.getElementById('lightbox');
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lb.trigger && lb.trigger.focus) lb.trigger.focus();
+  }
+
+  function lbStep(d) {
+    const n = lb.i + d;
+    if (n < 0 || n >= lb.photos.length) return;
+    lb.i = n;
+    lbRender();
+  }
+
+  function initLightbox() {
+    if (initLightbox.done) return;
+    initLightbox.done = true;
+
+    document.getElementById('lbClose').addEventListener('click', closeLightbox);
+    document.getElementById('lbPrev').addEventListener('click', () => lbStep(-1));
+    document.getElementById('lbNext').addEventListener('click', () => lbStep(1));
+
+    // Click backdrop (but not the image) to close
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (!e.target.closest('.lb-stage, .lb-arrow, .lb-close')) closeLightbox();
+    });
+
+    // Keyboard: Esc closes, arrows navigate
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') lbStep(-1);
+      else if (e.key === 'ArrowRight') lbStep(1);
+    });
+
+    // Touch swipe on the image
+    let x0 = null;
+    const stage = document.querySelector('.lb-stage');
+    stage.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) lbStep(dx < 0 ? 1 : -1);
+      x0 = null;
+    }, { passive: true });
+
+    // Open from any item photo / gallery slide (delegated, survives re-renders)
+    document.getElementById('menuMain').addEventListener('click', (e) => {
+      if (e.target.closest('.gallery-dot, .gallery-arrow')) return;  // those control the inline carousel
+      const gallery = e.target.closest('.item-gallery');
+      const photo = e.target.closest('.item-photo');
+      const itemEl = e.target.closest('.item');
+      const caption = itemEl ? (itemEl.dataset.name || '') : '';
+
+      if (gallery) {
+        const slides = [...gallery.querySelectorAll('.gallery-slide')];
+        const photos = slides.map((s) => s.querySelector('img')?.getAttribute('src')).filter(Boolean);
+        const slide = e.target.closest('.gallery-slide');
+        const idx = slide ? slides.indexOf(slide) : 0;
+        openLightbox(photos, idx, caption);
+      } else if (photo) {
+        const src = photo.querySelector('img')?.getAttribute('src');
+        if (src) openLightbox([src], 0, caption);
+      }
+    });
+  }
+
+  // Wire up swipe carousels: sync dots + counter to scroll, enable arrow/dot taps.
+  function initGalleries() {
+    document.querySelectorAll('.item-gallery').forEach(gallery => {
+      const track = gallery.querySelector('.gallery-track');
+      const dots = [...gallery.querySelectorAll('.gallery-dot')];
+      const counter = gallery.querySelector('.gallery-count-now');
+      const prev = gallery.querySelector('.gallery-arrow.prev');
+      const next = gallery.querySelector('.gallery-arrow.next');
+      const count = dots.length;
+      if (!track || count < 2) return;
+
+      const slideW = () => track.querySelector('.gallery-slide').getBoundingClientRect().width;
+      const current = () => Math.round(track.scrollLeft / slideW());
+
+      const sync = () => {
+        const idx = Math.max(0, Math.min(count - 1, current()));
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        if (counter) counter.textContent = String(idx + 1);
+        if (prev) prev.disabled = idx === 0;
+        if (next) next.disabled = idx === count - 1;
+      };
+
+      const goTo = (i) => track.scrollTo({ left: slideW() * i, behavior: 'smooth' });
+
+      let raf = null;
+      track.addEventListener('scroll', () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => { raf = null; sync(); });
+      }, { passive: true });
+
+      dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+      if (prev) prev.addEventListener('click', () => goTo(Math.max(0, current() - 1)));
+      if (next) next.addEventListener('click', () => goTo(Math.min(count - 1, current() + 1)));
+
+      sync();
+    });
   }
 
   function initNavBehavior() {

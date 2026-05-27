@@ -1,6 +1,8 @@
 # Adding Photo Upload to Your Menu
 
-This adds the ability to upload food photos for each menu item. Photos will appear as **hero images** on the customer menu — large, premium-style like Uber Eats or Coupang Eats.
+This adds the ability to upload food photos for each menu item. Photos appear as **hero images** on the customer menu — large, premium-style like Uber Eats or Coupang Eats.
+
+You can now add **multiple photos per item**. When an item has more than one photo, the customer menu shows a **swipeable gallery** with dot indicators (and left/right arrows on desktop). The first photo is the **cover**. Customers can also **tap any photo to view it full-screen** and swipe through the rest.
 
 ## Setup — one-time, 2 minutes
 
@@ -18,6 +20,15 @@ This creates:
 - A new `image_url` column on the items table
 - A storage bucket called `menu-photos` (5MB max per file)
 - Security policies (public can view, only admins can upload)
+
+### 1b. Enable multiple photos per item
+
+To store **several photos per item**, also run `migration-add-multiple-images.sql`:
+
+- **SQL Editor** → **+ New query**
+- Paste the full contents of `migration-add-multiple-images.sql` → **Run**
+
+This adds an `images` array column and copies any existing single photo into it, so nothing is lost. The admin panel writes both columns: `images` (the full ordered list) and `image_url` (kept as the cover, for backward compatibility).
 
 ### 2. Verify the storage bucket exists
 
@@ -39,11 +50,11 @@ Wait 1-2 min for Vercel to redeploy.
 
 1. Sign in to admin (`/admin.html`)
 2. Click any item to edit it (or click **+ Add Item**)
-3. Below the Section dropdown, you'll see a "**📷 Tap to upload photo**" area
-4. Click it → pick a photo from your phone or computer
-5. Wait 2-3 seconds for upload (the system automatically resizes to max 1600px wide to save space)
+3. Below the Section dropdown, you'll see a **Photos** area with an "**Add photo**" tile
+4. Click it → pick **one or several** photos from your phone or computer (multi-select is supported)
+5. Wait a couple seconds per photo (the system automatically resizes to max 1600px wide to save space)
 6. Click **Save**
-7. The photo appears on the customer menu within seconds
+7. The photos appear on the customer menu within seconds
 
 ### Tips for good food photos
 
@@ -54,10 +65,12 @@ Wait 1-2 min for Vercel to redeploy.
 - **Phone camera is fine** — iPhone or Samsung shoots better food photos than most "professional" setups
 - **Aspect ratio**: doesn't matter, the menu uses 4:3 cropping automatically
 
-### Replacing or removing a photo
+### Managing multiple photos
 
-- **Change**: Click the "Change" button on the photo preview
-- **Remove**: Click the "Remove" button — photo deletes from storage and from the item
+- **Add more**: Click the "Add photo" tile again — each new photo is appended to the row
+- **Remove one**: Click the **×** in the top-right corner of a thumbnail (it deletes from storage too)
+- **Choose the cover**: Click the **star** on any non-cover thumbnail to move it to the front. The first photo (marked **Cover**) is what shows in the item list and as the first slide customers see.
+- The order shown in the admin grid is the order customers swipe through.
 
 ---
 

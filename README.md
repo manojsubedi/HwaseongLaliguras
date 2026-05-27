@@ -28,6 +28,11 @@ Authentic Nepali & Indian cuisine in Hwaseong, established 2026.
 
 See `SETUP_GUIDE.md` for the full walkthrough (15 minutes).
 
+## 🧭 Building new features
+
+See `DEVELOPMENT_GUIDE.md` — the design system, conventions, and recipes for adding fields,
+photos, and components so they match the rest of the project.
+
 ## 🔄 Updating the menu
 
 Sign into `/admin.html` with your Supabase credentials and edit items directly. Changes appear on the customer menu within 1-2 minutes.
