@@ -589,6 +589,168 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
+
+  /* ============ VIEW TOGGLE (card vs compact list) ============ */
+  /* Sticky-nav toggle: lives to the right of the section tabs */
+  nav.tabs { display: flex; align-items: stretch; }
+  .tabs-inner { flex: 1; min-width: 0; }
+  .view-toggle {
+    flex-shrink: 0; display: flex; align-items: center; gap: 2px;
+    padding: var(--s-2) var(--s-3); border-left: 1px solid var(--line);
+  }
+  .view-btn {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 0; border-radius: 8px; background: transparent;
+    color: var(--ink-mute); cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .view-btn:hover { color: var(--ink); background: var(--paper-warm); }
+  .view-btn[aria-pressed="true"] {
+    color: var(--brand-blue); background: var(--brand-blue-soft);
+  }
+  .view-btn svg { width: 18px; height: 18px; }
+
+  /* Hero hint — small text-style toggle below the story */
+  .view-hint {
+    margin-top: var(--s-5);
+    display: inline-flex; align-items: center; gap: var(--s-1);
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-faint);
+  }
+  .view-hint-label { margin-right: 4px; }
+  .view-hint-btn {
+    border: 0; background: transparent;
+    padding: 6px 10px; min-height: 32px;
+    font: inherit; color: var(--ink-mute);
+    cursor: pointer; border-radius: 100px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .view-hint-btn:hover { color: var(--ink); }
+  .view-hint-btn[aria-pressed="true"] {
+    color: var(--brand-blue); background: var(--brand-blue-soft);
+  }
+  .hero .view-hint { animation-delay: 0.6s; }
+
+  /* ============ SECTION COLOR CODING ============ */
+  /* Each section gets a soft colored band at the top, a colored title, a
+     deeper-coloured rule, and a thin accent edge on every item — so the
+     menu reads like a paper-print with one course per "page". */
+  section.accent-red   { --section-accent: var(--brand-red);   --section-accent-soft: var(--brand-red-soft); }
+  section.accent-blue  { --section-accent: var(--brand-blue);  --section-accent-soft: var(--brand-blue-soft); }
+  section.accent-green { --section-accent: var(--brand-green); --section-accent-soft: var(--brand-green-soft); }
+  section.accent-gold  { --section-accent: var(--accent-gold); --section-accent-soft: var(--accent-gold-soft); }
+
+  section[class*="accent-"] {
+    background-image: linear-gradient(180deg, var(--section-accent-soft) 0%, transparent 240px);
+  }
+  section[class*="accent-"] .section-head h2 { color: var(--section-accent); }
+  section[class*="accent-"] .section-head .rule {
+    width: 48px; height: 2px; opacity: 0.9;
+    background: var(--section-accent);
+  }
+  section[class*="accent-"] .item {
+    border-left: 2px solid var(--section-accent-soft);
+    padding-left: var(--s-3);
+    margin-left: calc(var(--s-3) * -1);
+    transition: border-left-color 0.2s ease;
+  }
+  section[class*="accent-"] .item:hover { border-left-color: var(--section-accent); }
+  /* Featured items keep the gold background + star badge, but pick up the
+     current section's accent on the left so the section color story stays
+     consistent across all of its items. */
+  section[class*="accent-"] .item.featured { border-left-color: var(--section-accent); }
+
+  /* ============ SECTION VIEW MODES (Card / List / Grid) ============ */
+  /* The Card / List / Grid toggle restyles how SECTION HEADERS appear, not
+     items. Items always render in their default vertical layout. */
+
+  /* The item count + chevron live inside every section header but are
+     only visible in List/Grid modes. */
+  .section-count {
+    display: none;
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-mute); font-variant-numeric: tabular-nums;
+  }
+  .section-chevron {
+    display: none;
+    width: 14px; height: 14px; flex-shrink: 0;
+    color: var(--section-accent, var(--ink-mute));
+  }
+
+  /* -------- LIST mode — section header collapses to a compact row -------- */
+  body.view-list section { padding: 0; background: none; }
+  body.view-list .section-head {
+    display: flex; align-items: center; gap: var(--s-3);
+    margin: var(--s-4) var(--s-5) var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    border-radius: 10px;
+    background: var(--section-accent-soft, var(--paper-warm));
+    border-left: 4px solid var(--section-accent, var(--accent-gold));
+    text-align: left;
+  }
+  body.view-list .section-head .section-eyebrow { display: none; }
+  body.view-list .section-head h2 {
+    font-size: 17px; margin: 0;
+    color: var(--section-accent, var(--ink));
+    line-height: 1.2; flex: 0 1 auto;
+  }
+  body.view-list .section-head .kr {
+    font-size: 12px; margin: 0 0 0 var(--s-1);
+    color: var(--ink-mute); letter-spacing: 0;
+    flex: 1 1 auto;
+  }
+  body.view-list .section-head .kr::before { content: '· '; opacity: 0.6; }
+  body.view-list .section-head .rule { display: none; }
+  body.view-list .section-head .section-count { display: inline-flex; align-items: center; }
+  body.view-list .section-head .section-chevron { display: inline-block; }
+  body.view-list section > .item { margin-left: var(--s-5); margin-right: var(--s-5); }
+  body.view-list section[class*="accent-"] .item { padding-left: var(--s-3); }
+
+  /* -------- GRID mode — sections become 2-col tiles, items hidden -------- */
+  body.view-grid main {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3);
+    padding: var(--s-5);
+  }
+  body.view-grid section {
+    padding: var(--s-4) var(--s-3);
+    margin: 0; border-radius: 14px;
+    background: var(--section-accent-soft, var(--paper-warm));
+    background-image: none;
+    border: 1px solid var(--section-accent-soft, var(--line));
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    min-height: 130px;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center;
+  }
+  body.view-grid section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+  /* Hide all section content except the header — items only re-appear when
+     the user taps a tile (which switches to Card mode + scrolls). */
+  body.view-grid section > *:not(.section-head) { display: none; }
+  body.view-grid .section-head {
+    margin: 0; display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  body.view-grid .section-head .section-eyebrow { font-size: 9px; }
+  body.view-grid .section-head h2 {
+    font-size: 18px; margin: 0;
+    color: var(--section-accent, var(--ink));
+  }
+  body.view-grid .section-head .kr { font-size: 12px; }
+  body.view-grid .section-head .rule {
+    margin-top: var(--s-1); width: 24px; height: 2px;
+    background: var(--section-accent, var(--accent-gold)); opacity: 0.6;
+  }
+  body.view-grid .section-head .section-count { display: inline; margin-top: var(--s-1); }
+
+  /* Card-mode default: hide count + chevron. */
+  body:not(.view-list):not(.view-grid) .section-count,
+  body:not(.view-list):not(.view-grid) .section-chevron { display: none; }
 </style>
 </head>
 <body>
@@ -609,11 +771,28 @@
   <div class="estd-badge">Established 2026</div>
   <p class="story">Named for Nepal's national flower — the crimson rhododendron of the Himalayas, blooming where few things grow.</p>
   <p class="story-kr">네팔의 국화 — 히말라야의 진홍빛 랄리구라스, 가장 척박한 곳에서도 피어나는 꽃에서 이름을 따왔습니다.</p>
+  <div class="view-hint" role="group" aria-label="Section layout">
+    <span class="view-hint-label">View</span>
+    <button class="view-hint-btn" data-view="card" aria-pressed="true">Card</button>
+    <button class="view-hint-btn" data-view="list" aria-pressed="false">List</button>
+    <button class="view-hint-btn" data-view="grid" aria-pressed="false">Grid</button>
+  </div>
 </header>
 
 <nav class="tabs" id="navbar">
   <div class="tabs-inner" id="tabsInner">
     <!-- populated by JS -->
+  </div>
+  <div class="view-toggle" role="group" aria-label="Section layout">
+    <button class="view-btn" data-view="card" aria-label="Card view — full section headers" aria-pressed="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="8" rx="2"/><rect x="4" y="13" width="16" height="8" rx="2"/></svg>
+    </button>
+    <button class="view-btn" data-view="list" aria-label="List view — compact section rows" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="view-btn" data-view="grid" aria-label="Grid view — section tiles" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -742,26 +921,35 @@
     return `
       <div class="item${featured}" data-name="${escapeAttr(item.name_en)}">
         ${photo}
-        <div class="item-head">
-          <span class="item-name"><span class="${mark}" role="img" aria-label="${markLabel}"></span>${sigSr}${item.name_en}${spiceMarks(item.spice_level)}</span>
-          <span class="item-price"><span class="currency">₩</span>${fmtPrice(item.price)}</span>
+        <div class="item-body">
+          <div class="item-head">
+            <span class="item-name"><span class="${mark}" role="img" aria-label="${markLabel}"></span>${sigSr}${item.name_en}${spiceMarks(item.spice_level)}</span>
+            <span class="item-price"><span class="currency">₩</span>${fmtPrice(item.price)}</span>
+          </div>
+          ${item.name_kr ? `<div class="item-name-kr">${item.name_kr}</div>` : ''}
+          ${item.desc_en ? `<div class="item-desc">${item.desc_en}</div>` : ''}
+          ${item.desc_kr ? `<div class="item-desc-kr">${item.desc_kr}</div>` : ''}
         </div>
-        ${item.name_kr ? `<div class="item-name-kr">${item.name_kr}</div>` : ''}
-        ${item.desc_en ? `<div class="item-desc">${item.desc_en}</div>` : ''}
-        ${item.desc_kr ? `<div class="item-desc-kr">${item.desc_kr}</div>` : ''}
       </div>
     `;
   }
 
   function renderSection(section, items) {
     const color = section.accent_color || 'gold';
+    const n = items.length;
+    // The count + chevron live inside every section header but only show
+    // in List / Grid view modes (CSS-controlled via body.view-list/grid).
+    const countLabel = `${n} item${n === 1 ? '' : 's'}`;
+    const chevron = '<svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
     return `
-      <section id="${section.slug}">
+      <section id="${section.slug}" class="accent-${color}">
         <div class="section-head">
           ${section.eyebrow ? `<div class="section-eyebrow ${color}">${section.eyebrow}</div>` : ''}
           <h2>${section.name_en}</h2>
           ${section.name_kr ? `<div class="kr">${section.name_kr}</div>` : ''}
           <div class="rule ${color}"></div>
+          <span class="section-count">${countLabel}</span>
+          ${chevron}
         </div>
         ${items.map(renderItem).join('')}
       </section>
@@ -1025,6 +1213,44 @@
 
     backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
+
+  // ============ VIEW TOGGLE (card / list / grid for section headers) ============
+  // Wires every [data-view] button (sticky nav + hero hint) to the same state;
+  // preference persists in localStorage so returning visitors keep their view.
+  const VIEW_KEY = 'laliguras.view';
+  const VIEWS = ['card', 'list', 'grid'];
+  function applyView(view) {
+    const v = VIEWS.includes(view) ? view : 'card';
+    document.body.classList.remove('view-list', 'view-grid');
+    if (v === 'list' || v === 'grid') document.body.classList.add(`view-${v}`);
+    document.querySelectorAll('[data-view]').forEach(btn => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.view === v));
+    });
+    try { localStorage.setItem(VIEW_KEY, v); } catch (_) { /* private mode */ }
+  }
+  function initViewToggle() {
+    let saved = 'card';
+    try { saved = localStorage.getItem(VIEW_KEY) || 'card'; } catch (_) {}
+    applyView(saved);
+    document.querySelectorAll('[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => applyView(btn.dataset.view));
+    });
+    // In Grid mode, tapping a section tile drills back into Card mode and
+    // scrolls to that section so the user sees its items.
+    document.getElementById('menuMain').addEventListener('click', (e) => {
+      if (!document.body.classList.contains('view-grid')) return;
+      const section = e.target.closest('main section');
+      if (!section) return;
+      e.preventDefault();
+      const id = section.id;
+      applyView('card');
+      requestAnimationFrame(() => {
+        const target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+  initViewToggle();
 
   // Boot
   if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR-PROJECT')) {
