@@ -86,18 +86,45 @@
     content: ''; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
     width: 50px; height: 1px; background: var(--accent-gold); opacity: 0.5;
   }
+  /* GREETING — auto-fading carousel. Three greetings cross-fade in place so
+     they never crowd a narrow screen (e.g. iPhone SE). Fixed height = no CLS.
+     Falls back to a clean vertical stack when motion is reduced. */
   .greeting {
+    position: relative; height: 22px; margin-bottom: var(--s-5);
+  }
+  .greet {
+    position: absolute; left: 0; right: 0; top: 0;
+    display: flex; align-items: baseline; justify-content: center;
+    gap: 6px; white-space: nowrap;
     font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
     letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
-    margin-bottom: var(--s-5);
+    opacity: 0;
+    animation: greetFade 9s ease-in-out infinite;
   }
-  .greeting .deva {
-    font-family: 'Tiro Devanagari Hindi', serif; font-size: 15px; letter-spacing: 0;
-    color: var(--brand-red); margin-right: var(--s-3); text-transform: none;
+  .greet:nth-child(1) { animation-delay: 0s; }
+  .greet:nth-child(2) { animation-delay: -6s; }
+  .greet:nth-child(3) { animation-delay: -3s; }
+  .greet .deva {
+    font-family: 'Tiro Devanagari Hindi', serif; font-size: 16px;
+    letter-spacing: 0.02em; color: var(--brand-red); text-transform: none;
   }
-  .greeting .kr {
-    font-family: 'Noto Sans KR', sans-serif; letter-spacing: 0.1em;
-    margin-left: var(--s-3); color: var(--ink-soft);
+  .greet .kr {
+    font-family: 'Noto Sans KR', sans-serif; letter-spacing: 0.12em;
+    color: var(--ink-soft);
+  }
+  @keyframes greetFade {
+    0%   { opacity: 0; transform: translateY(5px); }
+    6%   { opacity: 1; transform: translateY(0); }
+    28%  { opacity: 1; transform: translateY(0); }
+    34%  { opacity: 0; transform: translateY(-5px); }
+    100% { opacity: 0; transform: translateY(-5px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .greeting { height: auto; }
+    .greet {
+      position: static; opacity: 1 !important; transform: none !important;
+      animation: none !important; margin-bottom: 2px;
+    }
   }
   .logo-wrap { width: 140px; height: 140px; margin: 0 auto var(--s-5); position: relative; }
   .logo-wrap::before {
@@ -520,6 +547,28 @@
     color: var(--ink-mute); letter-spacing: 0.1em; text-transform: uppercase;
   }
 
+  /* SKELETON — ghost of the real menu while data fetches. Shimmer reuses the
+     same animation as image placeholders so it feels like one system. */
+  .skel { padding: var(--s-7) var(--s-5) var(--s-6); }
+  .skel + .skel { border-top: 1px solid var(--line-soft); }
+  .skel-block {
+    background: linear-gradient(100deg, var(--paper-warm) 30%, #EEEDE7 50%, var(--paper-warm) 70%);
+    background-size: 220% 100%; animation: shimmer 1.4s linear infinite;
+    border-radius: 6px;
+  }
+  .skel-head { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: var(--s-6); }
+  .skel-title { width: 170px; height: 28px; border-radius: 8px; }
+  .skel-sub   { width: 90px;  height: 12px; }
+  .skel-item  { padding: var(--s-5) 0; border-bottom: 1px solid var(--line-soft); }
+  .skel-item:last-child { border-bottom: none; }
+  .skel-photo { width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; margin-bottom: var(--s-4); }
+  .skel-row   { display: flex; justify-content: space-between; gap: var(--s-3); align-items: baseline; }
+  .skel-name  { width: 55%; height: 17px; }
+  .skel-price { width: 46px; height: 14px; }
+  .skel-desc  { height: 12px; margin-top: 12px; }
+  .skel-desc.w90 { width: 90%; }
+  .skel-desc.w70 { width: 70%; }
+
   /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(8px); }
@@ -543,8 +592,10 @@
 <body>
 
 <header class="hero">
-  <div class="greeting">
-    <span class="deva">नमस्ते</span> Namaste <span class="kr">안녕하세요</span>
+  <div class="greeting" aria-label="Welcome — Namaste — 안녕하세요">
+    <span class="greet" aria-hidden="true"><span class="deva">नमस्ते</span></span>
+    <span class="greet" aria-hidden="true">Namaste</span>
+    <span class="greet" aria-hidden="true"><span class="kr">안녕하세요</span></span>
   </div>
   <div class="logo-wrap">
     <img src="logo.png" alt="Laliguras Restaurant — Established 2026" loading="eager">
@@ -564,10 +615,29 @@
   </div>
 </nav>
 
-<main id="menuMain">
-  <div class="loading">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading menu…</div>
+<main id="menuMain" role="status" aria-busy="true" aria-label="Loading menu">
+  <span class="sr-only">Loading menu…</span>
+  <!-- Skeleton placeholder — replaced by the real menu once data loads -->
+  <div class="skel" aria-hidden="true">
+    <div class="skel-head">
+      <div class="skel-block skel-title"></div>
+      <div class="skel-block skel-sub"></div>
+    </div>
+    <div class="skel-item">
+      <div class="skel-block skel-photo"></div>
+      <div class="skel-row"><div class="skel-block skel-name"></div><div class="skel-block skel-price"></div></div>
+      <div class="skel-block skel-desc w90"></div>
+      <div class="skel-block skel-desc w70"></div>
+    </div>
+    <div class="skel-item">
+      <div class="skel-row"><div class="skel-block skel-name"></div><div class="skel-block skel-price"></div></div>
+      <div class="skel-block skel-desc w90"></div>
+    </div>
+    <div class="skel-item">
+      <div class="skel-row"><div class="skel-block skel-name"></div><div class="skel-block skel-price"></div></div>
+      <div class="skel-block skel-desc w90"></div>
+      <div class="skel-block skel-desc w70"></div>
+    </div>
   </div>
 </main>
 
@@ -601,13 +671,15 @@
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.LALIGURAS_CONFIG || {};
 
   if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
-    document.getElementById('menuMain').innerHTML = `
+    const m = document.getElementById('menuMain');
+    m.innerHTML = `
       <div class="loading">
         <div class="loading-text" style="color: var(--brand-red); text-align: center; padding: 20px;">
           Could not load menu library.<br>Please check your internet and refresh.
         </div>
       </div>
     `;
+    m.setAttribute('aria-busy', 'false');
     throw new Error('Supabase library missing');
   }
 
@@ -713,8 +785,10 @@
       if (iErr) throw iErr;
 
       if (!sections || sections.length === 0) {
-        document.getElementById('menuMain').innerHTML =
+        const m = document.getElementById('menuMain');
+        m.innerHTML =
           '<div class="loading"><div class="loading-text">No menu items yet. Visit the admin page to add items.</div></div>';
+        m.setAttribute('aria-busy', 'false');
         return;
       }
 
@@ -729,6 +803,7 @@
       main.innerHTML = sections
         .map(s => renderSection(s, itemsBySection[s.id] || []))
         .join('');
+      main.setAttribute('aria-busy', 'false');
 
       renderTabs(sections);
 
@@ -738,13 +813,15 @@
       initLightbox();
     } catch (err) {
       console.error('Failed to load menu:', err);
-      document.getElementById('menuMain').innerHTML = `
+      const m = document.getElementById('menuMain');
+      m.innerHTML = `
         <div class="loading">
           <div class="loading-text" style="color: var(--brand-red);">
             Could not load menu.<br>Please check your connection and try again.
           </div>
         </div>
       `;
+      m.setAttribute('aria-busy', 'false');
     }
   }
 
@@ -949,13 +1026,15 @@
 
   // Boot
   if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR-PROJECT')) {
-    document.getElementById('menuMain').innerHTML = `
+    const m = document.getElementById('menuMain');
+    m.innerHTML = `
       <div class="loading">
         <div class="loading-text" style="color: var(--brand-red);">
           Configuration needed.<br>Edit config.js with your Supabase keys.
         </div>
       </div>
     `;
+    m.setAttribute('aria-busy', 'false');
   } else {
     loadMenu();
   }

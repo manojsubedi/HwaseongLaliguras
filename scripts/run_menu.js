@@ -2,7 +2,6 @@
 // of the hero (logo visible) plus the full page so I can verify the new logo
 // landed correctly in the live app.
 
-const puppeteer = require('puppeteer-core');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -40,6 +39,7 @@ const server = http.createServer((req, res) => {
 });
 
 (async () => {
+  const puppeteer = (await import('puppeteer-core')).default;
   await new Promise((r) => server.listen(PORT, r));
   console.log(`server: http://localhost:${PORT}/`);
 
