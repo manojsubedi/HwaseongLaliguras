@@ -105,5 +105,9 @@ update items set image_url = 'images/masala-milk-tea.png'   where name_en = 'Mas
 update items set image_url = 'images/soft-drinks.png'       where name_en = 'Fanta · Coke · Cider';
 update items set image_url = 'images/soft-drinks.png'       where name_en = 'Red Bull';
 
+-- Eighth batch — beer + wine share one luxury drink-display photo.
+update items set image_url = 'images/beer-wine.png'         where name_en = 'Beer';
+update items set image_url = 'images/beer-wine.png'         where name_en = 'Wine · Sweet or Red';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
