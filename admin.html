@@ -72,6 +72,11 @@
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
+    /* Warm crimson→gold halo behind the card, matching the customer hero. */
+    background:
+      radial-gradient(110% 55% at 50% 0%, var(--brand-soft) 0%, transparent 55%),
+      radial-gradient(70% 38% at 50% 2%, var(--gold-soft) 0%, transparent 50%),
+      var(--bg);
   }
   .login-card {
     background: var(--surface);
@@ -85,7 +90,11 @@
     text-align: center;
     margin-bottom: 32px;
   }
-  .login-brand img { width: 64px; height: 64px; border-radius: 50%; margin-bottom: 12px; border: 1px solid var(--line); }
+  .login-brand img {
+    width: 72px; height: 72px; border-radius: 50%; margin-bottom: 16px;
+    border: 3px solid #fff; outline: 1px solid var(--gold); outline-offset: 4px;
+    box-shadow: 0 0 0 1px var(--line), 0 10px 26px rgba(28,24,20,0.16);
+  }
   .login-brand h1 {
     font-family: 'EB Garamond', 'Noto Sans KR', serif;
     font-size: 24px; font-weight: 700;
@@ -160,7 +169,11 @@
     min-height: 56px;
   }
   .topbar-brand { display: flex; align-items: center; gap: 10px; }
-  .topbar-brand img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); }
+  .topbar-brand img {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 2px solid #fff; outline: 1px solid var(--gold); outline-offset: 1px;
+    box-shadow: 0 0 0 1px var(--line);
+  }
   .topbar-brand .name {
     font-family: 'EB Garamond', 'Noto Sans KR', serif; font-weight: 700; font-size: 16px;
     color: var(--brand); white-space: nowrap;
@@ -713,27 +726,39 @@
   .stat {
     position: relative;
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; padding: 14px 16px 14px 18px;
+    border-radius: 12px; padding: 15px 16px 15px 18px;
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
   }
-  .stat:hover { border-color: var(--ink-faint); box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+  .stat:hover {
+    border-color: var(--accent, var(--ink-faint));
+    box-shadow: 0 4px 14px rgba(22,22,22,0.07);
+    transform: translateY(-1px);
+  }
   /* Accent strip on the left edge — color carries meaning, label carries it too */
   .stat::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0;
     width: 3px; background: var(--accent, var(--line));
   }
-  .stat.red    { --accent: var(--brand); }
-  .stat.green  { --accent: var(--green); }
-  .stat.gold   { --accent: var(--gold); }
-  .stat.blue   { --accent: var(--blue); }
+  /* Soft accent wash from the top-left corner (invisible on the neutral card). */
+  .stat::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(130% 110% at 0% 0%, var(--accent-soft, transparent) 0%, transparent 62%);
+    opacity: 0.7;
+  }
+  .stat.red    { --accent: var(--brand); --accent-soft: var(--brand-soft); }
+  .stat.green  { --accent: var(--green); --accent-soft: var(--green-soft); }
+  .stat.gold   { --accent: var(--gold);  --accent-soft: var(--gold-soft); }
+  .stat.blue   { --accent: var(--blue);  --accent-soft: var(--blue-soft); }
+  .stat .label, .stat .value { position: relative; z-index: 1; }
   .stat .label {
     font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--ink-mute); margin-bottom: 4px;
+    color: var(--ink-mute); margin-bottom: 5px;
   }
   .stat .value {
-    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 24px; font-weight: 700;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 26px; font-weight: 700;
     line-height: 1; font-variant-numeric: tabular-nums;
+    color: var(--accent, var(--ink));
   }
   .stat .value.muted { color: var(--ink-faint); }
   @media (max-width: 768px) {
