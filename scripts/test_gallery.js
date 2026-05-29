@@ -164,15 +164,37 @@ const assert = (name, cond, extra = '') => {
     assert('next arrow → counter shows 2', afterArrow.counter === '2', afterArrow.counter);
     assert('prev arrow enabled after leaving slide 1', afterArrow.prevEnabled === true);
 
-    // --- Lightbox: open by clicking the carousel image ---
-    await page.evaluate(() => document.querySelector('.gallery-track .gallery-slide img').click());
+    // --- Detail sheet: tapping the item opens the bottom sheet ---
+    await page.evaluate(() => document.querySelectorAll('.item')[0].querySelector('.item-name').click());
+    await new Promise((r) => setTimeout(r, 350));
+    const detailOpen = await page.evaluate(() => ({
+      open: document.getElementById('detail').classList.contains('open'),
+      name: document.getElementById('dtName').textContent,
+      price: document.getElementById('dtPrice').textContent.replace(/\s/g, ''),
+      heroImgs: document.getElementById('dtHero').querySelectorAll('img').length,
+      spiceOpts: document.getElementById('dtSpiceOpts').children.length,
+      spiceOn: !!document.querySelector('#dtSpiceOpts .spice-opt.on'),
+      sigChip: !!document.querySelector('#dtTags .chip.sig'),
+    }));
+    console.log('detail open:', JSON.stringify(detailOpen));
+    assert('detail sheet opens on item tap', detailOpen.open === true);
+    assert('detail shows item name', detailOpen.name === 'Triple Photo Dish', detailOpen.name);
+    assert('detail shows price ₩12,000', detailOpen.price === '₩12,000', detailOpen.price);
+    assert('detail hero shows the photo', detailOpen.heroImgs === 1, 'imgs ' + detailOpen.heroImgs);
+    assert('detail shows 3 spice options', detailOpen.spiceOpts === 3, 'opts ' + detailOpen.spiceOpts);
+    assert('detail highlights a spice level', detailOpen.spiceOn === true);
+    assert('signature dish shows signature chip', detailOpen.sigChip === true);
+    await page.screenshot({ path: path.join(SHOT_DIR, 'detail.png') });
+
+    // --- Lightbox: open from the detail hero photo ---
+    await page.evaluate(() => document.getElementById('dtHero').querySelector('img').click());
     await new Promise((r) => setTimeout(r, 300));
     const lbOpen = await page.evaluate(() => {
       const el = document.getElementById('lightbox');
       return { open: el.classList.contains('open'), total: document.getElementById('lbTotal').textContent, now: document.getElementById('lbNow').textContent, caption: document.getElementById('lbCaption').textContent.trim() };
     });
     console.log('lightbox open:', JSON.stringify(lbOpen));
-    assert('lightbox opens on photo tap', lbOpen.open === true);
+    assert('lightbox opens from detail hero', lbOpen.open === true);
     assert('lightbox shows total = 3', lbOpen.total === '3', lbOpen.total);
     assert('lightbox caption = clean item name', lbOpen.caption === 'Triple Photo Dish', lbOpen.caption);
     await page.screenshot({ path: path.join(SHOT_DIR, 'lightbox.png') });
@@ -183,24 +205,55 @@ const assert = (name, cond, extra = '') => {
     const lbNext = await page.evaluate(() => document.getElementById('lbNow').textContent);
     assert('lightbox next → photo 2', lbNext === '2', lbNext);
 
-    // Esc closes
+    // Esc closes the lightbox but leaves the detail sheet open beneath it
     await page.keyboard.press('Escape');
     await new Promise((r) => setTimeout(r, 250));
-    const lbClosed = await page.evaluate(() => document.getElementById('lightbox').classList.contains('open'));
-    assert('Escape closes the lightbox', lbClosed === false);
+    const afterEsc1 = await page.evaluate(() => ({
+      lb: document.getElementById('lightbox').classList.contains('open'),
+      detail: document.getElementById('detail').classList.contains('open'),
+    }));
+    assert('Escape closes the lightbox', afterEsc1.lb === false);
+    assert('detail sheet stays open under the lightbox', afterEsc1.detail === true);
 
-    // Single-photo item also opens a 1-photo lightbox (no arrows)
-    await page.evaluate(() => document.querySelectorAll('.item')[1].querySelector('.item-photo img').click());
+    // A second Esc closes the detail sheet
+    await page.keyboard.press('Escape');
+    await new Promise((r) => setTimeout(r, 250));
+    const detailClosed = await page.evaluate(() => document.getElementById('detail').classList.contains('open'));
+    assert('Escape closes the detail sheet', detailClosed === false);
+
+    // --- No-photo item: dish-icon fallback (inline tile + detail hero) ---
+    const fallback = await page.evaluate(() => ({
+      inlineIcon: !!document.querySelectorAll('.item')[2].querySelector('.item-icon svg'),
+    }));
+    assert('no-photo item shows inline dish-icon fallback', fallback.inlineIcon === true);
+
+    await page.evaluate(() => document.querySelectorAll('.item')[2].querySelector('.item-name').click());
+    await new Promise((r) => setTimeout(r, 300));
+    const fbDetail = await page.evaluate(() => ({
+      heroFallback: document.getElementById('dtHero').classList.contains('fallback'),
+      heroIcon: !!document.querySelector('#dtHero .dish-icon svg'),
+      spiceHidden: document.getElementById('dtSpice').style.display === 'none',
+    }));
+    assert('no-photo detail hero uses icon fallback', fbDetail.heroFallback === true);
+    assert('no-photo detail hero renders a dish icon', fbDetail.heroIcon === true);
+    assert('no-spice dish hides the spice guide', fbDetail.spiceHidden === true);
+    await page.evaluate(() => document.getElementById('dtClose').click());
+
+    // --- Single-photo item: detail → 1-photo lightbox (no arrows) ---
+    await page.evaluate(() => document.querySelectorAll('.item')[1].querySelector('.item-name').click());
+    await new Promise((r) => setTimeout(r, 250));
+    await page.evaluate(() => document.getElementById('dtHero').querySelector('img').click());
     await new Promise((r) => setTimeout(r, 250));
     const lbSingle = await page.evaluate(() => ({
       open: document.getElementById('lightbox').classList.contains('open'),
       total: document.getElementById('lbTotal').textContent,
       arrowsHidden: document.getElementById('lbNext').hidden && document.getElementById('lbPrev').hidden,
     }));
-    assert('single-photo item opens lightbox', lbSingle.open === true);
+    assert('single-photo detail opens a lightbox', lbSingle.open === true);
     assert('single-photo lightbox total = 1', lbSingle.total === '1', lbSingle.total);
     assert('arrows hidden for single photo', lbSingle.arrowsHidden === true);
     await page.evaluate(() => document.getElementById('lbClose').click());
+    await page.evaluate(() => document.getElementById('dtClose').click());
 
     console.log(process.exitCode ? '\nRESULT: some checks FAILED' : '\nRESULT: all gallery checks PASSED');
   } finally {
