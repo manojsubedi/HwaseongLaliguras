@@ -98,5 +98,12 @@ update items set image_url = 'images/whisky.png'            where name_en = 'Old
 update items set image_url = 'images/whisky.png'            where name_en = 'Black Label · Jack Daniel''s';
 update items set image_url = 'images/whisky.png'            where name_en = 'Red Label · Tequila';
 
+-- Seventh batch — remaining drinks (Stitch photography) ------------------
+update items set image_url = 'images/strawberry-lassi.png'  where name_en = 'Strawberry Lassi';
+update items set image_url = 'images/masala-milk-tea.png'   where name_en = 'Masala Milk Tea';
+-- Assorted sodas/energy-drinks photo (includes Red Bull) shared by both.
+update items set image_url = 'images/soft-drinks.png'       where name_en = 'Fanta · Coke · Cider';
+update items set image_url = 'images/soft-drinks.png'       where name_en = 'Red Bull';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
