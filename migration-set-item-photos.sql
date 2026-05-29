@@ -31,5 +31,17 @@ update items set image_url = 'images/mutton-fry.jpg'       where name_en = 'Mutt
 update items set image_url = 'images/nepali-dhido.jpg'     where name_en = 'Nepali Dhido · Chicken';
 update items set image_url = 'images/pani-puri.jpg'        where name_en = 'Pani Puri';
 
+-- Third batch of photos (Stitch food photography) ------------------------
+update items set image_url = 'images/bhatmash-sadeko.png'   where name_en = 'Bhatmash Sadeko';
+update items set image_url = 'images/bhutan-khasi.png'      where name_en = 'Bhutan · Khasi Ko';
+update items set image_url = 'images/buffalo-sukuti.png'    where name_en = 'Buffalo Sukuti';
+update items set image_url = 'images/chicken-chilly.png'    where name_en = 'Chicken Chilly';
+update items set image_url = 'images/local-chicken-soup.png' where name_en = 'Local Chicken · Soup';
+update items set image_url = 'images/chauchau-sadeko.png'   where name_en = 'Nepali Chauchau Sadeko';
+update items set image_url = 'images/pangra.png'            where name_en = 'Pangra';
+update items set image_url = 'images/pork-sekuwa.png'       where name_en = 'Pork Sekuwa';
+update items set image_url = 'images/ras-gulab.png'         where name_en = 'Ras Gulab with Yogurt';
+update items set image_url = 'images/thukpa.png'            where name_en = 'Thukpa · Mix';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
