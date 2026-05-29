@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#FCF9F4">
 <meta name="description" content="Laliguras Restaurant — authentic Nepali & Indian cuisine in Hwaseong, est. 2026">
 <title>Laliguras · 라리구라스 · Menu</title>
 <link rel="icon" href="logo.png">
@@ -11,21 +11,24 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 
 <style>
   :root {
-    --paper: #FFFFFF;
-    --paper-warm: #FAFAF8;
-    --ink: #161616;
+    /* Rhododendron Modern — warm cream surfaces replace harsh white so the
+       crimson accents and food photography feel integrated, not abrasive. */
+    --paper: #FCF9F4;          /* surface / background */
+    --paper-warm: #F0EDE9;     /* surface-container — one tonal step up */
+    --paper-card: #FFFFFF;     /* surface-container-lowest — raised cards */
+    --ink: #1C1C19;
     --ink-soft: #383838;
     --ink-mute: #6B6B6B;
     --ink-faint: #B5B5B5;
-    --brand-red: #B91C2C;
-    --brand-red-deep: #7A0F1A;
+    --brand-red: #B91C2C;      /* primary-container */
+    --brand-red-deep: #93001A; /* primary */
     --brand-red-soft: #FBE9EB;
     --brand-blue: #1E3A6F;
     --brand-blue-deep: #142852;
@@ -33,10 +36,25 @@
     --brand-green: #2D7A3F;
     --brand-green-deep: #1F5530;
     --brand-green-soft: #E8F2EB;
-    --accent-gold: #C9A227;
+    --accent-gold: #C9A227;    /* spice-gold */
     --accent-gold-soft: #FFF8E1;
-    --line: #E8E8E8;
-    --line-soft: #F0F0F0;
+    --line: #E6DED7;
+    --line-soft: #EFE9E2;
+
+    /* Typography — EB Garamond headlines, Be Vietnam Pro body, Inter labels */
+    --font-display: 'EB Garamond', 'Noto Sans KR', Georgia, serif;
+    --font-body: 'Be Vietnam Pro', 'Noto Sans KR', system-ui, sans-serif;
+    --font-label: 'Inter', 'Noto Sans KR', sans-serif;
+
+    /* Soft, friendly RM corner radii */
+    --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+
+    /* Ambient card shadow (10% charcoal, soft blur) per RM elevation spec */
+    --shadow-card: 0 1px 2px rgba(28,24,20,0.04), 0 8px 24px rgba(28,24,20,0.08);
+
+    /* Nepali Dhaka motif — low-opacity diamond lattice, used as a 3–5%
+       background texture so headers/sections feel culturally grounded. */
+    --dhaka: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0l20 20-20 20L0 20z' fill='%23B91C2C' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
 
     --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
     --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
@@ -45,7 +63,7 @@
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
     background: var(--paper); color: var(--ink);
-    font-family: 'Fraunces', 'Noto Sans KR', Georgia, serif;
+    font-family: var(--font-body);
     font-size: 16px; line-height: 1.55;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility; overflow-x: hidden;
@@ -53,7 +71,9 @@
   }
   body::before {
     content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139, 26, 26, 0.015), transparent 70%);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139, 26, 26, 0.04), transparent 70%),
+      var(--dhaka);
   }
   body > * { position: relative; z-index: 1; }
   ::selection { background: var(--brand-red); color: #fff; }
@@ -140,7 +160,7 @@
     box-shadow: 0 1px 2px rgba(27,20,16,0.08), 0 8px 24px rgba(27,20,16,0.12);
   }
   .brand-name {
-    font-family: 'Fraunces', serif; font-variation-settings: 'opsz' 144;
+    font-family: var(--font-display);
     font-weight: 700; font-size: clamp(36px, 11vw, 56px); line-height: 0.95;
     letter-spacing: -0.01em; color: var(--brand-red); margin-bottom: var(--s-2);
   }
@@ -173,7 +193,7 @@
     content: '◆'; font-size: 7px; color: var(--accent-gold); opacity: 0.7;
   }
   .story {
-    font-family: 'Fraunces', serif; font-style: italic; font-size: 15px;
+    font-family: var(--font-display); font-style: italic; font-size: 16px;
     line-height: 1.6; color: var(--ink-soft); margin: var(--s-6) auto 0;
     max-width: 32ch;
   }
@@ -185,7 +205,7 @@
   /* NAV */
   nav.tabs {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(252, 249, 244, 0.85);
     backdrop-filter: blur(12px) saturate(120%);
     -webkit-backdrop-filter: blur(12px) saturate(120%);
     border-bottom: 1px solid transparent;
@@ -229,7 +249,7 @@
   .section-eyebrow.gold { color: var(--accent-gold); }
 
   .section-head h2 {
-    font-family: 'Fraunces', serif; font-variation-settings: 'opsz' 96;
+    font-family: var(--font-display);
     font-weight: 600; font-size: 32px; line-height: 1.1;
     letter-spacing: -0.015em; color: var(--ink); margin-bottom: var(--s-1);
   }
@@ -246,16 +266,18 @@
   .section-head .rule.green { background: var(--brand-green); }
 
   /* ITEMS */
-  .item { padding: var(--s-5) 0; border-bottom: 1px solid var(--line-soft); }
+  .item { padding: var(--s-5) 0; border-bottom: 1px solid var(--line-soft); cursor: pointer; }
   .item:last-child { border-bottom: none; }
+  .item:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 4px; border-radius: var(--r-sm); }
   .item-photo {
     width: 100%;
     aspect-ratio: 4 / 3;
-    border-radius: 12px;
+    border-radius: var(--r-lg);
     overflow: hidden;
     margin-bottom: var(--s-4);
     background: var(--paper-warm);
     position: relative;
+    box-shadow: var(--shadow-card);
   }
   .item-photo img {
     width: 100%; height: 100%;
@@ -274,10 +296,11 @@
   .item-gallery {
     position: relative;
     width: 100%;
-    border-radius: 12px;
+    border-radius: var(--r-lg);
     overflow: hidden;
     margin-bottom: var(--s-4);
     background: var(--paper-warm);
+    box-shadow: var(--shadow-card);
   }
   .gallery-track {
     display: flex;
@@ -418,7 +441,7 @@
   .lb-caption {
     position: absolute; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0;
     text-align: center; padding: 0 24px;
-    font-family: 'Fraunces', serif; font-size: 15px; font-style: italic;
+    font-family: var(--font-display); font-size: 15px; font-style: italic;
     color: rgba(255,255,255,0.92);
   }
 
@@ -427,8 +450,8 @@
     gap: var(--s-3); margin-bottom: var(--s-1);
   }
   .item-name {
-    font-family: 'Fraunces', serif; font-variation-settings: 'opsz' 72;
-    font-weight: 600; font-size: 18px; line-height: 1.3;
+    font-family: var(--font-display);
+    font-weight: 600; font-size: 19px; line-height: 1.3;
     color: var(--ink); flex: 1; letter-spacing: -0.005em;
   }
   .mark {
@@ -458,8 +481,8 @@
     letter-spacing: 0.01em;
   }
   .item-desc {
-    font-family: 'Fraunces', serif; font-style: italic; font-size: 14px;
-    line-height: 1.5; color: var(--ink-mute); margin-bottom: var(--s-1);
+    font-family: var(--font-body); font-size: 14px;
+    line-height: 1.55; color: var(--ink-mute); margin-bottom: var(--s-1);
   }
   .item-desc-kr {
     font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
@@ -469,7 +492,7 @@
     background: linear-gradient(180deg, var(--accent-gold-soft), transparent);
     padding-left: var(--s-3); padding-right: var(--s-3);
     margin-left: calc(var(--s-3) * -1); margin-right: calc(var(--s-3) * -1);
-    border-radius: 6px; position: relative;
+    border-radius: var(--r-md); position: relative;
     border-left: 2px solid var(--accent-gold);
   }
   .item.featured::before {
@@ -505,7 +528,7 @@
   }
   .legend > span { display: inline-flex; align-items: center; gap: 4px; }
   .fine-print {
-    font-family: 'Fraunces', serif; font-style: italic; font-size: 13px;
+    font-family: var(--font-display); font-style: italic; font-size: 14px;
     line-height: 1.6; color: var(--ink-soft); margin-bottom: var(--s-2);
   }
   .fine-print-kr {
@@ -685,7 +708,7 @@
     display: flex; align-items: center; gap: var(--s-3);
     margin: var(--s-4) var(--s-5) var(--s-3);
     padding: var(--s-3) var(--s-4);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     background: var(--section-accent-soft, var(--paper-warm));
     border-left: 4px solid var(--section-accent, var(--accent-gold));
     text-align: left;
@@ -715,7 +738,7 @@
   }
   body.view-grid section {
     padding: var(--s-4) var(--s-3);
-    margin: 0; border-radius: 14px;
+    margin: 0; border-radius: var(--r-lg);
     background: var(--section-accent-soft, var(--paper-warm));
     background-image: none;
     border: 1px solid var(--section-accent-soft, var(--line));
@@ -751,6 +774,131 @@
   /* Card-mode default: hide count + chevron. */
   body:not(.view-list):not(.view-grid) .section-count,
   body:not(.view-list):not(.view-grid) .section-chevron { display: none; }
+
+  /* ============ DISH ICON FALLBACK ============ */
+  /* Photoless items get a culturally-themed line-art icon on a soft, Dhaka-
+     textured crimson panel — so the menu reads consistently with or without
+     food photography. Icons inherit color via currentColor. */
+  .item-icon {
+    width: 100%; height: 128px;
+    border-radius: var(--r-lg); margin-bottom: var(--s-4);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--brand-red-soft), var(--paper-warm));
+    box-shadow: var(--shadow-card); color: var(--brand-red-deep);
+  }
+  .item-icon::before { content: ''; position: absolute; inset: 0; background: var(--dhaka); }
+  .item-icon svg { width: 52px; height: 52px; position: relative; opacity: 0.85; }
+
+  /* ============ ITEM DETAIL — bottom sheet ============ */
+  .detail { position: fixed; inset: 0; z-index: 900; display: none; }
+  .detail.open { display: block; }
+  .detail-scrim {
+    position: absolute; inset: 0;
+    background: rgba(28, 24, 20, 0.55);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .detail.open .detail-scrim { opacity: 1; }
+  .detail-sheet {
+    position: absolute; left: 50%; bottom: 0;
+    transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 520px; max-height: 94vh;
+    background: var(--paper);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    box-shadow: 0 -12px 40px rgba(28, 24, 20, 0.22);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transition: transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+    padding-bottom: max(var(--s-6), env(safe-area-inset-bottom));
+  }
+  .detail.open .detail-sheet { transform: translateX(-50%) translateY(0); }
+  .detail-grab {
+    position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 4px; border-radius: 99px;
+    background: rgba(255, 255, 255, 0.75); z-index: 3; pointer-events: none;
+  }
+  .detail-close {
+    position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px;
+    width: 40px; height: 40px; border: none; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92); color: var(--ink);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    z-index: 3; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+    transition: background 0.2s ease;
+  }
+  .detail-close:hover { background: #fff; }
+  .detail-close svg { width: 22px; height: 22px; }
+
+  .detail-hero {
+    position: relative; width: 100%; aspect-ratio: 1.4;
+    overflow: hidden; background: var(--paper-warm);
+  }
+  .detail-hero img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+  .detail-hero.fallback {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--brand-red-soft), var(--paper-warm));
+    color: var(--brand-red-deep);
+  }
+  .detail-hero.fallback::before { content: ''; position: absolute; inset: 0; background: var(--dhaka); }
+  .detail-hero .dish-icon { position: relative; width: 96px; height: 96px; opacity: 0.9; }
+  .detail-hero .dish-icon svg { width: 100%; height: 100%; }
+  .detail-hero-grad {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.32), transparent 45%);
+  }
+
+  .detail-body { padding: var(--s-5) var(--s-5) 0; }
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-3); }
+  .detail-name {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 28px; line-height: 1.15; color: var(--ink);
+  }
+  .detail-name-kr { font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--ink-soft); margin-top: 4px; }
+  .detail-price {
+    font-family: var(--font-display); font-weight: 600; font-size: 22px;
+    color: var(--brand-red-deep); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .detail-price .currency { color: var(--ink-mute); font-size: 16px; margin-right: 1px; }
+
+  .detail-tags { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 99px;
+    font-family: var(--font-label); font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 2px; background: currentColor; }
+  .chip .dot.round { border-radius: 50%; }
+  .chip.veg { background: var(--brand-green-soft); color: var(--brand-green-deep); }
+  .chip.nv { background: var(--brand-red-soft); color: var(--brand-red-deep); }
+  .chip.spicy { background: var(--brand-red-soft); color: var(--brand-red-deep); }
+  .chip.sig { background: var(--accent-gold-soft); color: #8A6D00; }
+
+  .detail-desc { font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--ink-soft); margin-top: var(--s-4); }
+  .detail-desc-kr { font-family: 'Noto Sans KR', sans-serif; font-size: 13px; line-height: 1.7; color: var(--ink-mute); margin-top: var(--s-2); }
+
+  .detail-spice { margin-top: var(--s-5); padding-top: var(--s-5); border-top: 1px solid var(--line); }
+  .detail-spice-title {
+    font-family: var(--font-label); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);
+    margin-bottom: var(--s-3); display: flex; align-items: center; gap: var(--s-3);
+  }
+  .detail-spice-title::before { content: ''; width: 28px; height: 1px; background: var(--accent-gold); }
+  .spice-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); }
+  .spice-opt {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: var(--s-3) var(--s-2); border: 1px solid var(--line);
+    border-radius: var(--r-md); background: var(--paper-card); color: var(--ink-mute);
+    text-align: center;
+  }
+  .spice-opt.on { border: 2px solid var(--brand-red); background: var(--brand-red-soft); color: var(--brand-red-deep); padding: calc(var(--s-3) - 1px) calc(var(--s-2) - 1px); }
+  .spice-opt .dots { font-size: 11px; letter-spacing: -1px; height: 14px; }
+  .spice-opt .lvl { font-family: var(--font-label); font-size: 12px; font-weight: 600; color: var(--ink); }
+  .spice-opt.on .lvl { color: var(--brand-red-deep); }
+  .spice-opt .lvl-kr { font-family: 'Noto Sans KR', sans-serif; font-size: 10px; color: var(--ink-mute); display: block; margin-top: 1px; }
+  .detail-spice-note { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--ink-mute); margin-top: var(--s-3); }
+  .detail-foot {
+    font-family: var(--font-label); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--ink-faint); text-align: center; margin-top: var(--s-5);
+  }
 </style>
 </head>
 <body>
@@ -847,6 +995,35 @@
   <div class="lb-caption" id="lbCaption"></div>
 </div>
 
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dtName">
+  <div class="detail-scrim" data-close></div>
+  <div class="detail-sheet" role="document">
+    <div class="detail-grab" aria-hidden="true"></div>
+    <button class="detail-close" id="dtClose" aria-label="Close dish details" data-close>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="detail-hero" id="dtHero"></div>
+    <div class="detail-body">
+      <div class="detail-head">
+        <div>
+          <h2 class="detail-name" id="dtName"></h2>
+          <div class="detail-name-kr" id="dtNameKr"></div>
+        </div>
+        <div class="detail-price" id="dtPrice"></div>
+      </div>
+      <div class="detail-tags" id="dtTags"></div>
+      <p class="detail-desc" id="dtDesc"></p>
+      <p class="detail-desc-kr" id="dtDescKr"></p>
+      <div class="detail-spice" id="dtSpice">
+        <h3 class="detail-spice-title">Spice Level · 매운 정도</h3>
+        <div class="spice-opts" id="dtSpiceOpts"></div>
+        <p class="detail-spice-note">Adjustable on request — every dish is cooked to your taste. · 매운 정도는 조절 가능합니다.</p>
+      </div>
+      <p class="detail-foot">All prices in Korean Won · VAT inclusive · Freshly prepared</p>
+    </div>
+  </div>
+</div>
+
 <script>
   // ============ LOAD MENU FROM SUPABASE ============
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.LALIGURAS_CONFIG || {};
@@ -887,6 +1064,23 @@
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
 
+  // ============ DISH ICONS (line-art fallbacks) ============
+  // Used when an item has no photo — both inline (icon tile) and in the
+  // detail-sheet hero. Icons inherit color via currentColor.
+  const DISH_ICONS = {
+    momo:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/><circle cx="16.5" cy="7.5" r="1" fill="currentColor"/><circle cx="7.5" cy="16.5" r="1" fill="currentColor"/><circle cx="16.5" cy="16.5" r="1" fill="currentColor"/></svg>',
+    grill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10c0-2 2-3 2-3s2 1 2 3c0 2-2 3-2 3s-2-1-2-3Z"/><path d="M8 10c0-2 2-3 2-3s2 1 2 3c0 2-2 3-2 3s-2-1-2-3Z"/><path d="M13 10c0-2 2-3 2-3s2 1 2 3c0 2-2 3-2 3s-2-1-2-3Z"/><path d="M18 10c0-2 2-3 2-3s2 1 2 3c0 2-2 3-2 3s-2-1-2-3Z"/><path d="M2 14c0 4 5 7 10 7s10-3 10-7"/><path d="M7 14v2"/><path d="M12 14v2"/><path d="M17 14v2"/></svg>',
+    drink: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 2.5c-.7.9.7 1.6 0 2.6"/><path d="M12 2.5c-.7.9.7 1.6 0 2.6"/></svg>',
+    bowl:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12h19"/><path d="M4.5 12a7.5 7.5 0 0 0 15 0"/><path d="M9 3c-.7.9.7 1.6 0 2.6"/><path d="M13 2.5c-.7.9.7 1.6 0 2.6"/></svg>'
+  };
+  function dishIconSvg(item) {
+    const t = `${item.name_en || ''} ${item.name_kr || ''}`.toLowerCase();
+    if (/momo|dumpling|kothey/.test(t)) return DISH_ICONS.momo;
+    if (/sekuwa|grill|bbq|barbe|skewer|sukuti|tandoor|roast|kebab|tikka|choila|chhoila|wings|fry/.test(t)) return DISH_ICONS.grill;
+    if (/lassi|chai|tea|coffee|juice|water|beer|cola|soda|drink|mocktail|mango|milk|smoothie/.test(t)) return DISH_ICONS.drink;
+    return DISH_ICONS.bowl;
+  }
+
   function renderGallery(photos, name) {
     const altName = escapeAttr(name);
     if (photos.length === 0) return '';
@@ -917,10 +1111,13 @@
     const markLabel = item.is_veg ? 'Vegetarian' : 'Non-vegetarian';
     const featured = item.is_signature ? ' featured' : '';
     const sigSr = item.is_signature ? '<span class="sr-only">Signature dish. </span>' : '';
-    const photo = renderGallery(itemPhotos(item), item.name_en);
+    const photos = itemPhotos(item);
+    const media = photos.length
+      ? renderGallery(photos, item.name_en)
+      : `<div class="item-icon" aria-hidden="true">${dishIconSvg(item)}</div>`;
     return `
-      <div class="item${featured}" data-name="${escapeAttr(item.name_en)}">
-        ${photo}
+      <div class="item${featured}" data-name="${escapeAttr(item.name_en)}" data-id="${escapeAttr(item.id)}" role="button" tabindex="0" aria-label="${escapeAttr(item.name_en)} — view details">
+        ${media}
         <div class="item-body">
           <div class="item-head">
             <span class="item-name"><span class="${mark}" role="img" aria-label="${markLabel}"></span>${sigSr}${item.name_en}${spiceMarks(item.spice_level)}</span>
@@ -986,6 +1183,7 @@
       const itemsBySection = {};
       items.forEach(it => {
         (itemsBySection[it.section_id] = itemsBySection[it.section_id] || []).push(it);
+        itemsById[it.id] = it;
       });
 
       // Render
@@ -997,10 +1195,11 @@
 
       renderTabs(sections);
 
-      // Activate nav behavior + swipeable galleries + tap-to-zoom lightbox
+      // Activate nav behavior + swipeable galleries + detail sheet + lightbox
       initNavBehavior();
       initGalleries();
       initLightbox();
+      initDetail();
     } catch (err) {
       console.error('Failed to load menu:', err);
       const m = document.getElementById('menuMain');
@@ -1021,6 +1220,10 @@
     const wrap = img.closest('.item-photo, .gallery-slide');
     if (wrap) wrap.classList.add('loaded');
   }
+
+  // Loaded items keyed by id — powers the detail sheet without a re-fetch.
+  const itemsById = {};
+  let detailTrigger = null;
 
   // ============ LIGHTBOX (full-screen photo viewer) ============
   const lb = { photos: [], i: 0, trigger: null };
@@ -1084,10 +1287,13 @@
       if (!e.target.closest('.lb-stage, .lb-arrow, .lb-close')) closeLightbox();
     });
 
-    // Keyboard: Esc closes, arrows navigate
+    // Keyboard: Esc closes, arrows navigate. When the lightbox is open it
+    // consumes the keypress so a shared Esc doesn't also close the detail
+    // sheet beneath it (initLightbox runs before initDetail, so this listener
+    // fires first).
     document.addEventListener('keydown', (e) => {
       if (!document.getElementById('lightbox').classList.contains('open')) return;
-      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'Escape') { e.stopImmediatePropagation(); closeLightbox(); }
       else if (e.key === 'ArrowLeft') lbStep(-1);
       else if (e.key === 'ArrowRight') lbStep(1);
     });
@@ -1102,26 +1308,141 @@
       if (Math.abs(dx) > 40) lbStep(dx < 0 ? 1 : -1);
       x0 = null;
     }, { passive: true });
+  }
 
-    // Open from any item photo / gallery slide (delegated, survives re-renders)
+  // ============ ITEM DETAIL SHEET ============
+  // Tapping a menu item opens a bottom sheet with a full-bleed hero (photo or
+  // dish-icon fallback), bilingual name, price, dietary/spice/signature chips,
+  // description, and an informational spice-level guide. View-only — no cart.
+  const SPICE_OPTS = [
+    { key: 1, lvl: 'Mild',   kr: '순한맛', dots: '●' },
+    { key: 2, lvl: 'Medium', kr: '중간맛', dots: '●●' },
+    { key: 3, lvl: 'Hot',    kr: '매운맛', dots: '●●●' }
+  ];
+  function buildSpiceOpts(level) {
+    const active = !level ? 1 : (level >= 2 ? 3 : 2);
+    return SPICE_OPTS.map(o => `
+      <div class="spice-opt${o.key === active ? ' on' : ''}">
+        <span class="dots" aria-hidden="true">${o.dots}</span>
+        <span class="lvl">${o.lvl}<span class="lvl-kr">${o.kr}</span></span>
+      </div>`).join('');
+  }
+
+  function openDetail(id) {
+    const item = itemsById[id];
+    if (!item) return;
+    detailTrigger = document.activeElement;
+
+    const photos = itemPhotos(item);
+    const hero = document.getElementById('dtHero');
+    if (photos.length) {
+      hero.className = 'detail-hero';
+      hero.dataset.photos = JSON.stringify(photos);
+      hero.innerHTML = `<img src="${photos[0]}" alt="${escapeAttr(item.name_en)}"><div class="detail-hero-grad"></div>`;
+    } else {
+      hero.className = 'detail-hero fallback';
+      delete hero.dataset.photos;
+      hero.innerHTML = `<span class="dish-icon">${dishIconSvg(item)}</span>`;
+    }
+
+    document.getElementById('dtName').textContent = item.name_en || '';
+    const nameKr = document.getElementById('dtNameKr');
+    nameKr.textContent = item.name_kr || '';
+    nameKr.style.display = item.name_kr ? '' : 'none';
+    document.getElementById('dtPrice').innerHTML = `<span class="currency">₩</span>${fmtPrice(item.price)}`;
+
+    const tags = [];
+    tags.push(item.is_veg
+      ? '<span class="chip veg"><span class="dot round"></span>Vegetarian · 채식</span>'
+      : '<span class="chip nv"><span class="dot round"></span>Non-Veg · 비채식</span>');
+    if (item.spice_level) tags.push(`<span class="chip spicy">${'●'.repeat(item.spice_level)} ${item.spice_level >= 2 ? 'Spicy · 매운맛' : 'Mild · 약간 매움'}</span>`);
+    if (item.is_signature) tags.push('<span class="chip sig">★ Signature · 시그니처</span>');
+    document.getElementById('dtTags').innerHTML = tags.join('');
+
+    const desc = document.getElementById('dtDesc');
+    desc.textContent = item.desc_en || '';
+    desc.style.display = item.desc_en ? '' : 'none';
+    const descKr = document.getElementById('dtDescKr');
+    descKr.textContent = item.desc_kr || '';
+    descKr.style.display = item.desc_kr ? '' : 'none';
+
+    const spice = document.getElementById('dtSpice');
+    if (item.spice_level) {
+      spice.style.display = '';
+      document.getElementById('dtSpiceOpts').innerHTML = buildSpiceOpts(item.spice_level);
+    } else {
+      spice.style.display = 'none';
+    }
+
+    const el = document.getElementById('detail');
+    el.querySelector('.detail-sheet').scrollTop = 0;
+    el.classList.add('open');
+    el.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('dtClose').focus();
+  }
+
+  function closeDetail() {
+    const el = document.getElementById('detail');
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden', 'true');
+    // Keep scroll locked if the lightbox is still open above the sheet.
+    if (!document.getElementById('lightbox').classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+    if (detailTrigger && detailTrigger.focus) detailTrigger.focus();
+  }
+
+  function initDetail() {
+    if (initDetail.done) return;
+    initDetail.done = true;
+    const el = document.getElementById('detail');
+
+    // Open from any menu item (delegated; survives re-renders). Skip the inline
+    // gallery's own dot/arrow controls so swiping a card doesn't pop the sheet.
     document.getElementById('menuMain').addEventListener('click', (e) => {
-      if (e.target.closest('.gallery-dot, .gallery-arrow')) return;  // those control the inline carousel
-      const gallery = e.target.closest('.item-gallery');
-      const photo = e.target.closest('.item-photo');
+      if (e.target.closest('.gallery-dot, .gallery-arrow')) return;
       const itemEl = e.target.closest('.item');
-      const caption = itemEl ? (itemEl.dataset.name || '') : '';
-
-      if (gallery) {
-        const slides = [...gallery.querySelectorAll('.gallery-slide')];
-        const photos = slides.map((s) => s.querySelector('img')?.getAttribute('src')).filter(Boolean);
-        const slide = e.target.closest('.gallery-slide');
-        const idx = slide ? slides.indexOf(slide) : 0;
-        openLightbox(photos, idx, caption);
-      } else if (photo) {
-        const src = photo.querySelector('img')?.getAttribute('src');
-        if (src) openLightbox([src], 0, caption);
-      }
+      if (itemEl && itemEl.dataset.id != null) openDetail(itemEl.dataset.id);
     });
+    // Keyboard activation for the role="button" items.
+    document.getElementById('menuMain').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.target.closest('.gallery-dot, .gallery-arrow, button, a')) return;  // inner controls handle their own keys
+      const itemEl = e.target.closest('.item');
+      if (itemEl && itemEl.dataset.id != null) { e.preventDefault(); openDetail(itemEl.dataset.id); }
+    });
+
+    // Close on scrim / close button.
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]') || e.target.classList.contains('detail-scrim')) closeDetail();
+    });
+
+    // Hero photo → full-screen lightbox (reuses the existing viewer).
+    document.getElementById('dtHero').addEventListener('click', (e) => {
+      if (!e.target.closest('img')) return;
+      const hero = document.getElementById('dtHero');
+      let photos = [];
+      try { photos = JSON.parse(hero.dataset.photos || '[]'); } catch (_) {}
+      if (photos.length) openLightbox(photos, 0, document.getElementById('dtName').textContent);
+    });
+
+    // Esc closes the sheet — but only when the lightbox isn't open above it.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (document.getElementById('lightbox').classList.contains('open')) return;
+      if (el.classList.contains('open')) closeDetail();
+    });
+
+    // Swipe down (from the top of the sheet) to dismiss.
+    const sheet = el.querySelector('.detail-sheet');
+    let y0 = null;
+    sheet.addEventListener('touchstart', (e) => { y0 = sheet.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+    sheet.addEventListener('touchend', (e) => {
+      if (y0 === null) return;
+      if (e.changedTouches[0].clientY - y0 > 80) closeDetail();
+      y0 = null;
+    }, { passive: true });
   }
 
   // Wire up swipe carousels: sync dots + counter to scroll, enable arrow/dot taps.
