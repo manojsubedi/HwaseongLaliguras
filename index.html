@@ -67,7 +67,8 @@
     font-size: 16px; line-height: 1.55;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility; overflow-x: hidden;
-    padding-bottom: max(60px, env(safe-area-inset-bottom));
+    /* Room for the fixed bottom category bar so the footer is never hidden. */
+    padding-bottom: calc(66px + env(safe-area-inset-bottom));
   }
   body > * { position: relative; z-index: 1; }
   ::selection { background: var(--brand-red); color: #fff; }
@@ -196,18 +197,22 @@
     line-height: 1.7; color: var(--ink-mute); margin: var(--s-2) auto 0; max-width: 30ch;
   }
 
-  /* NAV */
+  /* NAV — fixed to the BOTTOM as a thumb-reachable category bar. It mirrors
+     the width of <main> (max 520px, centered) so it reads as part of the
+     menu, not a full-width app chrome. */
   nav.tabs {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(252, 249, 244, 0.85);
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    z-index: 100; width: 100%; max-width: 520px;
+    background: rgba(252, 249, 244, 0.92);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -4px 20px rgba(28, 24, 20, 0.08);
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: box-shadow 0.2s ease;
   }
   nav.tabs.scrolled {
-    border-bottom-color: var(--line);
-    box-shadow: 0 1px 12px rgba(0,0,0,0.04);
+    box-shadow: 0 -6px 24px rgba(28, 24, 20, 0.12);
   }
   .tabs-inner {
     display: flex; overflow-x: auto; scroll-behavior: smooth;
@@ -230,7 +235,7 @@
 
   /* MAIN */
   main { max-width: 520px; margin: 0 auto; }
-  section { padding: var(--s-7) var(--s-5) var(--s-6); scroll-margin-top: 64px; }
+  section { padding: var(--s-7) var(--s-5) var(--s-6); scroll-margin-top: 12px; }
   .section-head { text-align: center; margin-bottom: var(--s-6); }
   .section-eyebrow {
     font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
@@ -538,7 +543,7 @@
 
   /* BACK TO TOP */
   .back-top {
-    position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); right: 20px;
+    position: fixed; bottom: calc(76px + env(safe-area-inset-bottom)); right: 20px;
     width: 48px; height: 48px; background: var(--brand-blue); color: #FFFFFF;
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
     text-decoration: none; font-size: 16px; z-index: 99;
@@ -1490,8 +1495,9 @@
         e.preventDefault();
         const target = document.querySelector(id);
         if (target) {
-          const navH = navbar.offsetHeight;
-          const y = target.getBoundingClientRect().top + window.pageYOffset - navH - 4;
+          // Nav is fixed at the BOTTOM now — no top obstruction, so align the
+          // section to the top of the viewport with a small breathing gap.
+          const y = target.getBoundingClientRect().top + window.pageYOffset - 8;
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }
@@ -1516,7 +1522,7 @@
         visible.sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
         setActive(visible[0].target.id);
       }
-    }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+    }, { rootMargin: '-8px 0px -70% 0px', threshold: 0 });
     sections.forEach(s => io.observe(s));
 
     const onScroll = () => {

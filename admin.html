@@ -7,30 +7,32 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=EB+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 
 <style>
   :root {
-    --bg: #F7F7F5;
-    --surface: #FFFFFF;
-    --ink: #161616;
+    /* Rhododendron Modern — warm cream surfaces + crimson, matching the
+       customer menu (index.html) so admin and storefront feel like one brand. */
+    --bg: #FCF9F4;            /* surface / background — warm cream */
+    --surface: #FFFFFF;       /* raised cards / panels */
+    --ink: #1C1C19;           /* on-surface */
     --ink-soft: #383838;
     --ink-mute: #6B6B6B;
     --ink-faint: #B5B5B5;
-    --brand: #B91C2C;
-    --brand-deep: #7A0F1A;
+    --brand: #B91C2C;         /* primary-container (crimson) */
+    --brand-deep: #93001A;    /* primary */
     --brand-soft: #FBE9EB;
     --blue: #1E3A6F;
     --blue-soft: #E8EDF5;
     --green: #2D7A3F;
     --green-soft: #E8F2EB;
-    --gold: #C9A227;
+    --gold: #C9A227;          /* spice-gold */
     --gold-soft: #FFF8E1;
-    --line: #E5E5E2;
-    --line-soft: #EFEFEC;
+    --line: #E6DED7;          /* warm hairline */
+    --line-soft: #EFE9E2;
     --danger: #DC2626;
     --danger-soft: #FEE2E2;
     --success: #059669;
@@ -85,7 +87,7 @@
   }
   .login-brand img { width: 64px; height: 64px; border-radius: 50%; margin-bottom: 12px; border: 1px solid var(--line); }
   .login-brand h1 {
-    font-family: 'Fraunces', serif;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif;
     font-size: 24px; font-weight: 700;
     color: var(--brand); margin-bottom: 4px;
   }
@@ -160,7 +162,7 @@
   .topbar-brand { display: flex; align-items: center; gap: 10px; }
   .topbar-brand img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); }
   .topbar-brand .name {
-    font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-weight: 700; font-size: 16px;
     color: var(--brand); white-space: nowrap;
   }
   .topbar-brand .sub {
@@ -292,7 +294,7 @@
     margin-bottom: 6px;
   }
   .content-head h1 {
-    font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 28px; font-weight: 700;
     line-height: 1.1;
     color: var(--ink);
   }
@@ -327,7 +329,7 @@
   .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
 
   .group-header {
-    font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 14px; font-weight: 600;
     color: var(--ink-soft); margin: 20px 0 8px;
     display: flex; align-items: center; gap: 8px;
   }
@@ -507,7 +509,7 @@
   /* Heading shown inside the section form so the user knows whether they're
      adding a new section or editing an existing one. */
   .form-heading {
-    font-family: 'Fraunces', serif;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif;
     font-size: 16px; font-weight: 600;
     color: var(--ink); margin-bottom: 14px;
   }
@@ -537,7 +539,7 @@
     flex-shrink: 0;
   }
   .modal-head h2 {
-    font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 20px; font-weight: 600;
   }
   .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1 1 auto; min-height: 0; }
   /* Edit/Add mode: hide the section list + add button so the form has the
@@ -698,7 +700,7 @@
     color: var(--ink-mute);
   }
   .empty h3 {
-    font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 20px; font-weight: 600;
     color: var(--ink); margin-bottom: 8px;
   }
   .empty p { margin-bottom: 16px; }
@@ -730,7 +732,7 @@
     color: var(--ink-mute); margin-bottom: 4px;
   }
   .stat .value {
-    font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700;
+    font-family: 'EB Garamond', 'Noto Sans KR', serif; font-size: 24px; font-weight: 700;
     line-height: 1; font-variant-numeric: tabular-nums;
   }
   .stat .value.muted { color: var(--ink-faint); }

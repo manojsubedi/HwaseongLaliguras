@@ -19,6 +19,8 @@ const DIST = path.join(ROOT, 'dist');
 const HTML = ['index.html', 'admin.html', 'qr.html'];
 // Runtime assets the pages load directly (copied as-is).
 const ASSETS = ['config.js', 'logo.png', 'qrcode.min.js'];
+// Asset directories copied recursively (e.g. committed menu photos).
+const ASSET_DIRS = ['images'];
 
 const SCRIPT_RE = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;
 
@@ -65,6 +67,14 @@ async function buildHtml(file) {
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, path.join(DIST, a));
       console.log(`copied ${a}`);
+    }
+  }
+  for (const d of ASSET_DIRS) {
+    const src = path.join(ROOT, d);
+    if (fs.existsSync(src)) {
+      fs.cpSync(src, path.join(DIST, d), { recursive: true });
+      const n = fs.readdirSync(src).length;
+      console.log(`copied ${d}/ (${n} file${n === 1 ? '' : 's'})`);
     }
   }
   console.log('\nBuilt to dist/. Deploy the dist/ folder to serve the minified version.');
