@@ -157,7 +157,7 @@
   .brand-name {
     font-family: var(--font-display);
     font-weight: 700; font-size: clamp(36px, 11vw, 56px); line-height: 0.95;
-    letter-spacing: -0.01em; color: var(--brand-red); margin-bottom: var(--s-2);
+    letter-spacing: -0.01em; color: var(--brand-blue); margin-bottom: var(--s-2);
   }
   .brand-script {
     font-family: 'Tiro Devanagari Hindi', serif; font-size: 20px;
@@ -218,7 +218,16 @@
     display: flex; overflow-x: auto; scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch; scrollbar-width: none;
     padding: var(--s-3) var(--s-4); gap: var(--s-1);
+    /* Fade the leading/trailing edges so it's obvious the tab row keeps
+       going — a hard cut-off reads as "that's all there is". The fade only
+       appears on whichever side still has off-screen tabs. */
+    --fade: 22px;
+    --fade-l: var(--fade); --fade-r: var(--fade);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
   }
+  .tabs-inner.at-start { --fade-l: 0px; }
+  .tabs-inner.at-end   { --fade-r: 0px; }
   .tabs-inner::-webkit-scrollbar { display: none; }
   .tabs a {
     flex-shrink: 0; padding: 10px 14px;
@@ -616,41 +625,56 @@
   /* Sticky-nav toggle: lives to the right of the section tabs */
   nav.tabs { display: flex; align-items: stretch; }
   .tabs-inner { flex: 1; min-width: 0; }
+  /* Segmented control — the three views read as one connected switch,
+     with the active option lifted onto a white "pill" so it's obviously
+     the selected one (not three separate buttons). */
   .view-toggle {
     flex-shrink: 0; display: flex; align-items: center; gap: 2px;
-    padding: var(--s-2) var(--s-3); border-left: 1px solid var(--line);
+    align-self: center; margin: 0 var(--s-3) 0 var(--s-2);
+    padding: 3px; border-radius: 100px;
+    background: var(--paper-warm); border: 1px solid var(--line);
   }
   .view-btn {
-    width: 36px; height: 36px;
+    width: 34px; height: 30px;
     display: inline-flex; align-items: center; justify-content: center;
-    border: 0; border-radius: 8px; background: transparent;
+    border: 0; border-radius: 100px; background: transparent;
     color: var(--ink-mute); cursor: pointer;
-    transition: color 0.15s ease, background 0.15s ease;
+    transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
   }
-  .view-btn:hover { color: var(--ink); background: var(--paper-warm); }
+  .view-btn:hover { color: var(--ink); }
   .view-btn[aria-pressed="true"] {
-    color: var(--brand-blue); background: var(--brand-blue-soft);
+    color: var(--brand-blue); background: var(--paper-card);
+    box-shadow: 0 1px 3px rgba(28, 24, 20, 0.14);
   }
   .view-btn svg { width: 18px; height: 18px; }
 
   /* Hero hint — small text-style toggle below the story */
   .view-hint {
     margin-top: var(--s-5);
-    display: inline-flex; align-items: center; gap: var(--s-1);
+    display: inline-flex; align-items: center; gap: var(--s-2);
     font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
     letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-faint);
   }
-  .view-hint-label { margin-right: 4px; }
+  .view-hint-label { margin-right: 2px; }
+  /* Grouped pill — matches the sticky-nav segmented control */
+  .view-hint > .view-hint-btn { margin: 0; }
   .view-hint-btn {
     border: 0; background: transparent;
-    padding: 6px 10px; min-height: 32px;
+    padding: 6px 12px; min-height: 30px;
     font: inherit; color: var(--ink-mute);
     cursor: pointer; border-radius: 100px;
-    transition: color 0.15s ease, background 0.15s ease;
+    transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
   }
   .view-hint-btn:hover { color: var(--ink); }
   .view-hint-btn[aria-pressed="true"] {
-    color: var(--brand-blue); background: var(--brand-blue-soft);
+    color: var(--brand-blue); background: var(--paper-card);
+    box-shadow: 0 1px 3px rgba(28, 24, 20, 0.12);
+  }
+  /* wrap the three hero view buttons in a soft track */
+  .view-hint .view-hint-group {
+    display: inline-flex; gap: 2px; padding: 3px;
+    border-radius: 100px; background: var(--paper-warm);
+    border: 1px solid var(--line);
   }
   .hero .view-hint { animation-delay: 0.6s; }
 
@@ -920,9 +944,11 @@
   <p class="story-kr">네팔의 국화 — 히말라야의 진홍빛 랄리구라스, 가장 척박한 곳에서도 피어나는 꽃에서 이름을 따왔습니다.</p>
   <div class="view-hint" role="group" aria-label="Section layout">
     <span class="view-hint-label">View</span>
-    <button class="view-hint-btn" data-view="card" aria-pressed="true">Card</button>
-    <button class="view-hint-btn" data-view="list" aria-pressed="false">List</button>
-    <button class="view-hint-btn" data-view="grid" aria-pressed="false">Grid</button>
+    <span class="view-hint-group">
+      <button class="view-hint-btn" data-view="card" aria-pressed="true">Card</button>
+      <button class="view-hint-btn" data-view="list" aria-pressed="false">List</button>
+      <button class="view-hint-btn" data-view="grid" aria-pressed="false">Grid</button>
+    </span>
   </div>
 </header>
 
@@ -1531,6 +1557,18 @@
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+
+    // Toggle the edge fades on the tab row so users can see when there are
+    // more tabs off-screen left/right (and when they've hit either end).
+    const updateTabEdges = () => {
+      const max = tabsInner.scrollWidth - tabsInner.clientWidth;
+      const x = tabsInner.scrollLeft;
+      tabsInner.classList.toggle('at-start', x <= 1);
+      tabsInner.classList.toggle('at-end', x >= max - 1);
+    };
+    tabsInner.addEventListener('scroll', updateTabEdges, { passive: true });
+    window.addEventListener('resize', updateTabEdges, { passive: true });
+    updateTabEdges();
 
     backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
