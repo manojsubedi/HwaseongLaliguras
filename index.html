@@ -270,9 +270,12 @@
   section { padding: var(--s-7) var(--s-5) var(--s-6); scroll-margin-top: 12px; }
   .section-head { text-align: center; margin-bottom: var(--s-6); }
   .section-eyebrow {
-    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.32em; text-transform: uppercase;
-    color: var(--accent-gold); margin-bottom: var(--s-1);
+    display: inline-block;
+    font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent-gold); background: var(--accent-gold-soft);
+    padding: 4px 11px; border-radius: 100px;
+    margin-bottom: var(--s-3);
   }
   .section-eyebrow.red { color: var(--brand-red); }
   .section-eyebrow.blue { color: var(--brand-blue); }
@@ -289,12 +292,18 @@
     letter-spacing: 0.15em; color: var(--ink-mute); font-weight: 500;
   }
   .section-head .rule {
-    width: 32px; height: 1px; background: var(--accent-gold);
-    margin: var(--s-4) auto 0; opacity: 0.6;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    margin: var(--s-4) auto 0; color: var(--accent-gold);
+    font-size: 8px; line-height: 1;
   }
-  .section-head .rule.red { background: var(--brand-red); }
-  .section-head .rule.blue { background: var(--brand-blue); }
-  .section-head .rule.green { background: var(--brand-green); }
+  .section-head .rule::before, .section-head .rule::after {
+    content: ''; width: 30px; height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor); opacity: 0.7;
+  }
+  .section-head .rule::after { background: linear-gradient(90deg, currentColor, transparent); }
+  .section-head .rule.red { color: var(--brand-red); }
+  .section-head .rule.blue { color: var(--brand-blue); }
+  .section-head .rule.green { color: var(--brand-green); }
 
   /* ITEMS */
   .item { padding: var(--s-5) 0; border-bottom: 1px solid var(--line-soft); cursor: pointer; }
@@ -774,10 +783,10 @@
     background-image: linear-gradient(180deg, var(--section-accent-soft) 0%, transparent 240px);
   }
   section[class*="accent-"] .section-head h2 { color: var(--section-accent); }
-  section[class*="accent-"] .section-head .rule {
-    width: 48px; height: 2px; opacity: 0.9;
-    background: var(--section-accent);
+  section[class*="accent-"] .section-eyebrow {
+    color: var(--section-accent); background: var(--section-accent-soft);
   }
+  section[class*="accent-"] .section-head .rule { color: var(--section-accent); }
   section[class*="accent-"] .item {
     border-left: 2px solid var(--section-accent-soft);
     padding-left: var(--s-3);
@@ -1343,7 +1352,7 @@
           ${section.eyebrow ? `<div class="section-eyebrow ${color}">${section.eyebrow}</div>` : ''}
           <h2>${section.name_en}</h2>
           ${section.name_kr ? `<div class="kr">${section.name_kr}</div>` : ''}
-          <div class="rule ${color}"></div>
+          <div class="rule ${color}" aria-hidden="true">◆</div>
           <span class="section-count">${countLabel}</span>
           ${chevron}
         </div>
