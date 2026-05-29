@@ -43,5 +43,14 @@ update items set image_url = 'images/pork-sekuwa.png'       where name_en = 'Por
 update items set image_url = 'images/ras-gulab.png'         where name_en = 'Ras Gulab with Yogurt';
 update items set image_url = 'images/thukpa.png'            where name_en = 'Thukpa · Mix';
 
+-- Variant reuse — share an existing photo with close meat variants. Veg
+-- variants (Dhido Veg, Thakali Veg, Veg Biryani) are intentionally left
+-- blank so a meat photo never sits on a vegetarian dish.
+update items set image_url = 'images/nepali-dhido.jpg'   where name_en = 'Nepali Dhido · Mutton';
+update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Chicken';
+update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Pork';
+update items set image_url = 'images/mutton-biryani.jpg' where name_en = 'Chicken Biryani · Basmati';
+update items set image_url = 'images/mutton-biryani.jpg' where name_en = 'Pork Biryani · Basmati';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
