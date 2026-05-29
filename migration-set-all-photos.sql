@@ -89,7 +89,9 @@ from (values
   ('Strawberry Lassi',             'images/strawberry-lassi.png'),
   ('Masala Milk Tea',              'images/masala-milk-tea.png'),
   ('Fanta · Coke · Cider',         'images/soft-drinks.png'),
-  ('Red Bull',                     'images/soft-drinks.png')
+  ('Red Bull',                     'images/soft-drinks.png'),
+  ('Beer',                         'images/beer-wine.png'),
+  ('Wine · Sweet or Red',          'images/beer-wine.png')
 ) as v(name_en, url)
 where i.name_en = v.name_en;
 
