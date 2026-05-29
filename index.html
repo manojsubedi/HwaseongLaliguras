@@ -94,10 +94,15 @@
 
   /* HERO */
   .hero {
-    padding: var(--s-7) var(--s-5) var(--s-6);
+    padding: var(--s-5) var(--s-5) var(--s-5);
     text-align: center;
     position: relative;
     border-bottom: 1px solid var(--line);
+    /* Warm halo behind the masthead — crimson + gold fading into paper. */
+    background:
+      radial-gradient(120% 78% at 50% -12%, var(--brand-red-soft) 0%, transparent 55%),
+      radial-gradient(85% 55% at 50% -2%, var(--accent-gold-soft) 0%, transparent 48%),
+      var(--paper);
   }
   .hero::before {
     content: ''; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
@@ -107,7 +112,7 @@
      they never crowd a narrow screen (e.g. iPhone SE). Fixed height = no CLS.
      Falls back to a clean vertical stack when motion is reduced. */
   .greeting {
-    position: relative; height: 22px; margin-bottom: var(--s-5);
+    position: relative; height: 20px; margin-bottom: var(--s-3);
   }
   .greet {
     position: absolute; left: 0; right: 0; top: 0;
@@ -143,34 +148,52 @@
       animation: none !important; margin-bottom: 2px;
     }
   }
-  .logo-wrap { width: 140px; height: 140px; margin: 0 auto var(--s-5); position: relative; }
+  .logo-wrap { width: 92px; height: 92px; margin: 0 auto var(--s-3); position: relative; }
+  /* Warm gold-into-crimson glow behind the medallion. */
   .logo-wrap::before {
-    content: ''; position: absolute; inset: -8px;
-    background: radial-gradient(circle, rgba(139, 26, 26, 0.12) 30%, transparent 70%);
+    content: ''; position: absolute; inset: -14px;
+    background: radial-gradient(circle, rgba(201,162,39,0.22) 0%, rgba(139,26,26,0.10) 42%, transparent 70%);
     border-radius: 50%; z-index: -1;
+  }
+  /* Thin gold ring framing the logo like a crest. */
+  .logo-wrap::after {
+    content: ''; position: absolute; inset: -7px;
+    border: 1px solid var(--accent-gold); border-radius: 50%; opacity: 0.45;
   }
   .logo-wrap img {
     width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-    border: 1px solid var(--line);
-    box-shadow: 0 1px 2px rgba(27,20,16,0.08), 0 8px 24px rgba(27,20,16,0.12);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--line), 0 2px 6px rgba(27,20,16,0.10), 0 12px 30px rgba(27,20,16,0.16);
   }
   .brand-name {
     font-family: var(--font-display);
-    font-weight: 700; font-size: clamp(36px, 11vw, 56px); line-height: 0.95;
-    letter-spacing: -0.01em; color: var(--brand-blue); margin-bottom: var(--s-2);
+    font-weight: 700; font-size: clamp(30px, 9vw, 44px); line-height: 0.95;
+    letter-spacing: -0.01em; color: var(--brand-blue); margin-bottom: var(--s-1);
   }
   .brand-script {
-    font-family: 'Tiro Devanagari Hindi', serif; font-size: 20px;
-    color: var(--accent-gold); margin-bottom: var(--s-2); letter-spacing: 0.02em;
+    font-family: 'Tiro Devanagari Hindi', serif; font-size: 17px;
+    color: var(--accent-gold); margin-bottom: var(--s-1); letter-spacing: 0.02em;
   }
   .brand-script .kr {
     font-family: 'Noto Sans KR', sans-serif; color: var(--ink-soft);
     margin-left: var(--s-3); font-weight: 500;
   }
+  /* Ornamental gold divider — flanking hairlines around a ◆, echoing the badge. */
+  .brand-divider {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-top: var(--s-3); color: var(--accent-gold);
+    font-size: 9px; line-height: 1;
+  }
+  .brand-divider::before, .brand-divider::after {
+    content: ''; width: 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold));
+    opacity: 0.65;
+  }
+  .brand-divider::after { background: linear-gradient(90deg, var(--accent-gold), transparent); }
   .brand-tagline {
     font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
     letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-soft);
-    margin-top: var(--s-4); margin-bottom: var(--s-2);
+    margin-top: var(--s-3); margin-bottom: var(--s-2);
   }
   .brand-tagline-kr {
     font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
@@ -178,7 +201,7 @@
   }
   .estd-badge {
     display: inline-flex; align-items: center; gap: var(--s-2);
-    margin-top: var(--s-5); padding: var(--s-2) var(--s-4);
+    margin-top: var(--s-3); padding: var(--s-2) var(--s-4);
     border: 1px solid var(--accent-gold); border-radius: 100px;
     font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
     letter-spacing: 0.18em; text-transform: uppercase;
@@ -188,8 +211,8 @@
     content: '◆'; font-size: 7px; color: var(--accent-gold); opacity: 0.7;
   }
   .story {
-    font-family: var(--font-display); font-style: italic; font-size: 16px;
-    line-height: 1.6; color: var(--ink-soft); margin: var(--s-6) auto 0;
+    font-family: var(--font-display); font-style: italic; font-size: 14px;
+    line-height: 1.55; color: var(--ink-soft); margin: var(--s-4) auto 0;
     max-width: 32ch;
   }
   .story-kr {
@@ -558,7 +581,7 @@
      and every tile carries its gap as margin-right so the loop is seamless. */
   .taste-strip {
     position: relative; overflow: hidden;
-    margin: var(--s-6) calc(-1 * var(--s-5)) 0;
+    margin: var(--s-4) calc(-1 * var(--s-5)) 0;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
   }
@@ -671,6 +694,7 @@
   .hero .logo-wrap   { animation-delay: 0.1s; }
   .hero .brand-name  { animation-delay: 0.2s; }
   .hero .brand-script { animation-delay: 0.25s; }
+  .hero .brand-divider { animation-delay: 0.28s; }
   .hero .brand-tagline { animation-delay: 0.3s; }
   .hero .brand-tagline-kr { animation-delay: 0.32s; }
   .hero .estd-badge  { animation-delay: 0.4s; }
@@ -1025,11 +1049,10 @@
   </div>
   <h1 class="brand-name">Laliguras</h1>
   <div class="brand-script">लालीगुराँस<span class="kr">라리구라스</span></div>
+  <div class="brand-divider" aria-hidden="true">◆</div>
   <div class="brand-tagline">Nepali · Indian · Cuisine</div>
   <div class="brand-tagline-kr">네팔 · 인도 요리 · 화성</div>
   <div class="estd-badge">Established 2026</div>
-  <p class="story">Named for Nepal's national flower — the crimson rhododendron of the Himalayas, blooming where few things grow.</p>
-  <p class="story-kr">네팔의 국화 — 히말라야의 진홍빛 랄리구라스, 가장 척박한 곳에서도 피어나는 꽃에서 이름을 따왔습니다.</p>
   <div class="taste-strip" role="group" aria-label="Menu highlights — tap a photo to jump to the dish">
     <div class="taste-strip-track">
       <button class="taste-tile" data-target="Thakali Set · Mutton" aria-label="Thakali Set — jump to dish"><img src="images/thakali-set.jpg" alt="" loading="lazy" decoding="async"></button>
@@ -1058,14 +1081,6 @@
       <button class="taste-tile" data-target="Pani Puri" tabindex="-1" aria-hidden="true"><img src="images/pani-puri.jpg" alt="" loading="lazy" decoding="async"></button>
       <button class="taste-tile" data-target="Mango Lassi" tabindex="-1" aria-hidden="true"><img src="images/mango-lassi.jpg" alt="" loading="lazy" decoding="async"></button>
     </div>
-  </div>
-  <div class="view-hint" role="group" aria-label="Section layout">
-    <span class="view-hint-label">View</span>
-    <span class="view-hint-group">
-      <button class="view-hint-btn" data-view="card" aria-pressed="true">Card</button>
-      <button class="view-hint-btn" data-view="list" aria-pressed="false">List</button>
-      <button class="view-hint-btn" data-view="grid" aria-pressed="false">Grid</button>
-    </span>
   </div>
 </header>
 
