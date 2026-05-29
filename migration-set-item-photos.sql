@@ -43,14 +43,26 @@ update items set image_url = 'images/pork-sekuwa.png'       where name_en = 'Por
 update items set image_url = 'images/ras-gulab.png'         where name_en = 'Ras Gulab with Yogurt';
 update items set image_url = 'images/thukpa.png'            where name_en = 'Thukpa · Mix';
 
--- Variant reuse — share an existing photo with close meat variants. Veg
--- variants (Dhido Veg, Thakali Veg, Veg Biryani) are intentionally left
--- blank so a meat photo never sits on a vegetarian dish.
-update items set image_url = 'images/nepali-dhido.jpg'   where name_en = 'Nepali Dhido · Mutton';
+-- Variant reuse — share an existing photo with close meat variants.
+-- Veg Biryani is intentionally left blank so a meat photo never sits on a
+-- vegetarian dish (Dhido Mutton and Thakali Veg now have dedicated photos
+-- in the fourth batch below).
 update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Chicken';
 update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Pork';
 update items set image_url = 'images/mutton-biryani.jpg' where name_en = 'Chicken Biryani · Basmati';
 update items set image_url = 'images/mutton-biryani.jpg' where name_en = 'Pork Biryani · Basmati';
+
+-- Fourth batch of photos (Stitch food photography) -----------------------
+update items set image_url = 'images/nepali-dhido-mutton.png' where name_en = 'Nepali Dhido · Mutton';
+update items set image_url = 'images/thakali-set-veg.png'     where name_en = 'Thakali Set · Veg';
+update items set image_url = 'images/mutton-roast.png'        where name_en = 'Mutton Roast';
+update items set image_url = 'images/local-chicken-fry.png'   where name_en = 'Local Chicken · Fry';
+update items set image_url = 'images/nepali-mix-salad.png'    where name_en = 'Nepali Mix Salad';
+update items set image_url = 'images/samosa-chat.png'         where name_en = 'Samosa Chat · Mix';
+update items set image_url = 'images/veg-pakora.png'          where name_en = 'Veg Pakora';
+update items set image_url = 'images/jeera-rice.png'          where name_en = 'Jeera Rice · Basmati';
+update items set image_url = 'images/aloo-paratha.png'        where name_en = 'Aloo Paratha';
+update items set image_url = 'images/sweet-lassi.png'         where name_en = 'Sweet Lassi';
 
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
