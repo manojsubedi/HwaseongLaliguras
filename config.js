@@ -20,7 +20,7 @@ window.LALIGURAS_CONFIG = {
   RESTAURANT_NAME_KR: '라리구라스',
   LOCATION: 'Hwaseong',
   LOCATION_KR: '화성',
-  ESTABLISHED: 2026,
+  ESTABLISHED: 2015,
 
   // The base URL where the menu is hosted (used by QR generator)
   MENU_URL: 'https://hwaseong-laliguras.vercel.app/'
