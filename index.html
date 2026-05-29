@@ -69,12 +69,6 @@
     text-rendering: optimizeLegibility; overflow-x: hidden;
     padding-bottom: max(60px, env(safe-area-inset-bottom));
   }
-  body::before {
-    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139, 26, 26, 0.04), transparent 70%),
-      var(--dhaka);
-  }
   body > * { position: relative; z-index: 1; }
   ::selection { background: var(--brand-red); color: #fff; }
 
