@@ -85,5 +85,18 @@ update items set image_url = 'images/veg-biryani.png'        where name_en = 'Ve
 update items set image_url = 'images/mix-fried-rice.png'     where name_en = 'Mix Fried Rice';
 update items set image_url = 'images/veg-fried-rice.png'     where name_en = 'Veg Fried Rice';
 
+-- Sixth batch — remaining food item + beverages (Stitch photography) -------
+update items set image_url = 'images/pork-kan-gala.png'      where name_en = 'Pork · Kan & Gala';
+update items set image_url = 'images/tumba.png'              where name_en = 'Tumba';
+update items set image_url = 'images/soju.png'               where name_en = 'Soju';
+update items set image_url = 'images/soju.png'               where name_en = 'Soju Jhaneko';
+update items set image_url = 'images/khukuri-rum.png'        where name_en = 'Khukuri Rum';
+update items set image_url = 'images/hookah.png'             where name_en = 'Hookah';
+-- Whisky/spirits share one luxury-display photo.
+update items set image_url = 'images/whisky.png'            where name_en = 'Double Black';
+update items set image_url = 'images/whisky.png'            where name_en = 'Old Durbar · Black Chimney';
+update items set image_url = 'images/whisky.png'            where name_en = 'Black Label · Jack Daniel''s';
+update items set image_url = 'images/whisky.png'            where name_en = 'Red Label · Tequila';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;

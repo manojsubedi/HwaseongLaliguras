@@ -75,7 +75,17 @@ from (values
   ('Nepali Dhido · Veg',           'images/nepali-dhido-veg.png'),
   ('Veg Biryani · Basmati',        'images/veg-biryani.png'),
   ('Mix Fried Rice',               'images/mix-fried-rice.png'),
-  ('Veg Fried Rice',               'images/veg-fried-rice.png')
+  ('Veg Fried Rice',               'images/veg-fried-rice.png'),
+  ('Pork · Kan & Gala',            'images/pork-kan-gala.png'),
+  ('Tumba',                        'images/tumba.png'),
+  ('Soju',                         'images/soju.png'),
+  ('Soju Jhaneko',                 'images/soju.png'),
+  ('Khukuri Rum',                  'images/khukuri-rum.png'),
+  ('Hookah',                       'images/hookah.png'),
+  ('Double Black',                 'images/whisky.png'),
+  ('Old Durbar · Black Chimney',   'images/whisky.png'),
+  ('Black Label · Jack Daniel''s', 'images/whisky.png'),
+  ('Red Label · Tequila',          'images/whisky.png')
 ) as v(name_en, url)
 where i.name_en = v.name_en;
 
