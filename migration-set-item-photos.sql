@@ -44,9 +44,8 @@ update items set image_url = 'images/ras-gulab.png'         where name_en = 'Ras
 update items set image_url = 'images/thukpa.png'            where name_en = 'Thukpa · Mix';
 
 -- Variant reuse — share an existing photo with close meat variants.
--- Veg Biryani is intentionally left blank so a meat photo never sits on a
--- vegetarian dish (Dhido Mutton and Thakali Veg now have dedicated photos
--- in the fourth batch below).
+-- (Dhido Mutton, Thakali Veg, Veg Biryani now have dedicated photos in the
+-- fourth/fifth batches below.)
 update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Chicken';
 update items set image_url = 'images/thakali-set.jpg'    where name_en = 'Thakali Set · Pork';
 update items set image_url = 'images/mutton-biryani.jpg' where name_en = 'Chicken Biryani · Basmati';
@@ -63,6 +62,28 @@ update items set image_url = 'images/veg-pakora.png'          where name_en = 'V
 update items set image_url = 'images/jeera-rice.png'          where name_en = 'Jeera Rice · Basmati';
 update items set image_url = 'images/aloo-paratha.png'        where name_en = 'Aloo Paratha';
 update items set image_url = 'images/sweet-lassi.png'         where name_en = 'Sweet Lassi';
+
+-- Fifth batch of photos (Stitch food photography) ------------------------
+update items set image_url = 'images/chicken-wings.png'      where name_en = 'Chicken Wings';
+update items set image_url = 'images/pork-roast.png'         where name_en = 'Pork Roast';
+update items set image_url = 'images/pork-sadeko.png'        where name_en = 'Pork Sadeko';
+update items set image_url = 'images/pork-sukuti.png'        where name_en = 'Pork Sukuti';
+update items set image_url = 'images/pork-curry.png'         where name_en = 'Pork Curry';
+update items set image_url = 'images/aloo-jira-achar.png'    where name_en = 'Aloo Jira · Achar';
+update items set image_url = 'images/veg-chowmein.png'       where name_en = 'Chow Mein · Veg';
+update items set image_url = 'images/papad.png'              where name_en = 'Papad';
+update items set image_url = 'images/dhungri.png'            where name_en = 'Dhungri';
+update items set image_url = 'images/samosa.png'             where name_en = 'Samosa';
+update items set image_url = 'images/mix-fruit-salad.png'    where name_en = 'Mix Fruit Salad';
+update items set image_url = 'images/dal-fry.png'            where name_en = 'Dal Fry';
+update items set image_url = 'images/mix-veg.png'            where name_en = 'Mix Veg';
+update items set image_url = 'images/plain-naan.png'         where name_en = 'Plain Nan';
+update items set image_url = 'images/plain-paratha.png'      where name_en = 'Plain Paratha';
+update items set image_url = 'images/korean-plain-rice.png'  where name_en = 'Korean Plain Rice';
+update items set image_url = 'images/nepali-dhido-veg.png'   where name_en = 'Nepali Dhido · Veg';
+update items set image_url = 'images/veg-biryani.png'        where name_en = 'Veg Biryani · Basmati';
+update items set image_url = 'images/mix-fried-rice.png'     where name_en = 'Mix Fried Rice';
+update items set image_url = 'images/veg-fried-rice.png'     where name_en = 'Veg Fried Rice';
 
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;

@@ -55,7 +55,27 @@ from (values
   ('Veg Pakora',                   'images/veg-pakora.png'),
   ('Jeera Rice · Basmati',         'images/jeera-rice.png'),
   ('Aloo Paratha',                 'images/aloo-paratha.png'),
-  ('Sweet Lassi',                  'images/sweet-lassi.png')
+  ('Sweet Lassi',                  'images/sweet-lassi.png'),
+  ('Chicken Wings',                'images/chicken-wings.png'),
+  ('Pork Roast',                   'images/pork-roast.png'),
+  ('Pork Sadeko',                  'images/pork-sadeko.png'),
+  ('Pork Sukuti',                  'images/pork-sukuti.png'),
+  ('Pork Curry',                   'images/pork-curry.png'),
+  ('Aloo Jira · Achar',            'images/aloo-jira-achar.png'),
+  ('Chow Mein · Veg',              'images/veg-chowmein.png'),
+  ('Papad',                        'images/papad.png'),
+  ('Dhungri',                      'images/dhungri.png'),
+  ('Samosa',                       'images/samosa.png'),
+  ('Mix Fruit Salad',              'images/mix-fruit-salad.png'),
+  ('Dal Fry',                      'images/dal-fry.png'),
+  ('Mix Veg',                      'images/mix-veg.png'),
+  ('Plain Nan',                    'images/plain-naan.png'),
+  ('Plain Paratha',                'images/plain-paratha.png'),
+  ('Korean Plain Rice',            'images/korean-plain-rice.png'),
+  ('Nepali Dhido · Veg',           'images/nepali-dhido-veg.png'),
+  ('Veg Biryani · Basmati',        'images/veg-biryani.png'),
+  ('Mix Fried Rice',               'images/mix-fried-rice.png'),
+  ('Veg Fried Rice',               'images/veg-fried-rice.png')
 ) as v(name_en, url)
 where i.name_en = v.name_en;
 
