@@ -550,6 +550,65 @@
     letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-faint);
   }
 
+  /* TASTE STRIP — a slow marquee of the menu's own food photos that bookends
+     the page (top of hero + footer) so the masthead and sign-off feel of a
+     piece with the dishes between them. Purely decorative (aria-hidden); it
+     pauses on hover and degrades to a static swipeable row when motion is
+     reduced. The track holds two identical copies and slides exactly -50%,
+     and every tile carries its gap as margin-right so the loop is seamless. */
+  .taste-strip {
+    position: relative; overflow: hidden;
+    margin: var(--s-6) calc(-1 * var(--s-5)) 0;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+  }
+  .taste-strip-track {
+    display: flex; width: max-content;
+    animation: tasteScroll 48s linear infinite;
+  }
+  .taste-strip.reverse .taste-strip-track { animation-direction: reverse; }
+  /* Each tile is a button → tap/click (and keyboard Enter/Space) jumps to the
+     dish in the menu. Uniform tile width incl. margin keeps the -50% loop seamless. */
+  .taste-tile {
+    flex: none; display: block; padding: 0; margin-right: 10px;
+    border: 0; background: none; cursor: pointer; border-radius: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .taste-tile img {
+    display: block; width: 104px; height: 78px;
+    object-fit: cover; border-radius: 10px;
+    border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(27,20,16,0.06), 0 4px 12px rgba(27,20,16,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .taste-tile:hover img,
+  .taste-tile:focus-visible img {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 2px 6px rgba(27,20,16,0.12), 0 10px 22px rgba(27,20,16,0.16);
+  }
+  .taste-tile:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 3px; }
+  .taste-strip:hover .taste-strip-track,
+  .taste-strip:focus-within .taste-strip-track { animation-play-state: paused; }
+  @keyframes tasteScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .hero .taste-strip { animation-delay: 0.6s; }
+  /* Gold flash on the dish a taste-tile points to, after we scroll to it. */
+  @keyframes itemFlash {
+    0%, 55% { background-color: var(--accent-gold-soft); }
+    100%    { background-color: transparent; }
+  }
+  .item.flash { animation: itemFlash 1.8s ease-out; }
+  /* Footer version sits on the warm footer band, above the sign-off. */
+  footer .taste-strip { margin: 0 calc(-1 * var(--s-5)) var(--s-6); }
+  @media (prefers-reduced-motion: reduce) {
+    .taste-strip { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .taste-strip::-webkit-scrollbar { display: none; }
+    .taste-strip-track { animation: none; }
+    .taste-tile:last-child { margin-right: var(--s-5); }
+  }
+
   /* BACK TO TOP */
   .back-top {
     position: fixed; bottom: calc(76px + env(safe-area-inset-bottom)); right: 20px;
@@ -754,45 +813,74 @@
   body.view-list section > .item { margin-left: var(--s-5); margin-right: var(--s-5); }
   body.view-list section[class*="accent-"] .item { padding-left: var(--s-3); }
 
-  /* -------- GRID mode — sections become 2-col tiles, items hidden -------- */
+  /* Section thumbnail is Grid-only; never shows in Card/List view. */
+  .section-thumb { display: none; }
+
+  /* -------- GRID mode — sections become 2-col PHOTO tiles -------- */
   body.view-grid main {
-    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3);
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);
     padding: var(--s-5);
   }
   body.view-grid section {
-    padding: var(--s-4) var(--s-3);
-    margin: 0; border-radius: var(--r-lg);
-    background: var(--section-accent-soft, var(--paper-warm));
+    padding: 0; margin: 0; overflow: hidden;
+    border-radius: var(--r-lg);
+    background: var(--paper-card);
     background-image: none;
-    border: 1px solid var(--section-accent-soft, var(--line));
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    min-height: 130px;
-    display: flex; flex-direction: column; justify-content: center;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: flex; flex-direction: column;
     text-align: center;
   }
   body.view-grid section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(28, 24, 20, 0.14);
   }
-  /* Hide all section content except the header — items only re-appear when
-     the user taps a tile (which switches to Card mode + scrolls). */
-  body.view-grid section > *:not(.section-head) { display: none; }
+  body.view-grid section:active { transform: translateY(-1px); }
+  /* Photo header — a signature dish from the section. */
+  body.view-grid .section-thumb {
+    display: block; position: relative; width: 100%; height: 104px;
+    background: var(--section-accent-soft, var(--paper-warm));
+  }
+  body.view-grid .section-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Thin accent bar along the top + a soft fade into the title block below. */
+  body.view-grid .section-thumb::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 1;
+    background: var(--section-accent, var(--accent-gold));
+  }
+  body.view-grid .section-thumb::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, transparent 30%, transparent 62%, var(--paper-card) 100%);
+  }
+  body.view-grid .section-thumb-icon {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--section-accent, var(--accent-gold)); opacity: 0.55;
+  }
+  body.view-grid .section-thumb-icon svg { width: 38px; height: 38px; }
+  /* Hide everything except the photo + header — items re-appear only when the
+     user taps a tile (which switches to Card mode + scrolls). */
+  body.view-grid section > *:not(.section-head):not(.section-thumb) { display: none; }
   body.view-grid .section-head {
-    margin: 0; display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
+    margin: 0; padding: var(--s-3) var(--s-3) var(--s-4);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    flex: 1; justify-content: center;
   }
-  body.view-grid .section-head .section-eyebrow { font-size: 9px; }
+  body.view-grid .section-head .section-eyebrow { font-size: 9px; margin: 0; }
   body.view-grid .section-head h2 {
-    font-size: 18px; margin: 0;
+    font-size: 16px; line-height: 1.2; margin: 0;
     color: var(--section-accent, var(--ink));
   }
-  body.view-grid .section-head .kr { font-size: 12px; }
-  body.view-grid .section-head .rule {
-    margin-top: var(--s-1); width: 24px; height: 2px;
-    background: var(--section-accent, var(--accent-gold)); opacity: 0.6;
+  body.view-grid .section-head .kr { font-size: 11px; margin: 0; }
+  body.view-grid .section-head .rule { display: none; }
+  body.view-grid .section-head .section-count {
+    display: inline-block; margin-top: 7px;
+    padding: 3px 10px; border-radius: 100px;
+    background: var(--section-accent-soft, var(--paper-warm));
+    color: var(--section-accent, var(--ink-mute));
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   }
-  body.view-grid .section-head .section-count { display: inline; margin-top: var(--s-1); }
+  body.view-grid .section-head .section-chevron { display: none; }
 
   /* Card-mode default: hide count + chevron. */
   body:not(.view-list):not(.view-grid) .section-count,
@@ -942,6 +1030,35 @@
   <div class="estd-badge">Established 2026</div>
   <p class="story">Named for Nepal's national flower — the crimson rhododendron of the Himalayas, blooming where few things grow.</p>
   <p class="story-kr">네팔의 국화 — 히말라야의 진홍빛 랄리구라스, 가장 척박한 곳에서도 피어나는 꽃에서 이름을 따왔습니다.</p>
+  <div class="taste-strip" role="group" aria-label="Menu highlights — tap a photo to jump to the dish">
+    <div class="taste-strip-track">
+      <button class="taste-tile" data-target="Thakali Set · Mutton" aria-label="Thakali Set — jump to dish"><img src="images/thakali-set.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Sekuwa" aria-label="Mutton Sekuwa — jump to dish"><img src="images/mutton-sekuwa.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Steamed Momo" aria-label="Steamed Momo — jump to dish"><img src="images/steamed-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Jhol Momo" aria-label="Jhol Momo — jump to dish"><img src="images/chilli-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Tandoori Chicken · Whole" aria-label="Tandoori Chicken — jump to dish"><img src="images/tandoori-chicken.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Biryani · Basmati" aria-label="Mutton Biryani — jump to dish"><img src="images/mutton-biryani.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Paneer Butter Masala" aria-label="Paneer Butter Masala — jump to dish"><img src="images/paneer-masala.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Curry" aria-label="Chicken Curry — jump to dish"><img src="images/chicken-curry.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Lollipop" aria-label="Chicken Lollipop — jump to dish"><img src="images/chicken-lollipop.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chow Mein · Mix" aria-label="Chow Mein — jump to dish"><img src="images/chowmein.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Pani Puri" aria-label="Pani Puri — jump to dish"><img src="images/pani-puri.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mango Lassi" aria-label="Mango Lassi — jump to dish"><img src="images/mango-lassi.jpg" alt="" loading="lazy" decoding="async"></button>
+      <!-- second copy — keeps the marquee seamless; hidden from assistive tech -->
+      <button class="taste-tile" data-target="Thakali Set · Mutton" tabindex="-1" aria-hidden="true"><img src="images/thakali-set.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Sekuwa" tabindex="-1" aria-hidden="true"><img src="images/mutton-sekuwa.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Steamed Momo" tabindex="-1" aria-hidden="true"><img src="images/steamed-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Jhol Momo" tabindex="-1" aria-hidden="true"><img src="images/chilli-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Tandoori Chicken · Whole" tabindex="-1" aria-hidden="true"><img src="images/tandoori-chicken.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Biryani · Basmati" tabindex="-1" aria-hidden="true"><img src="images/mutton-biryani.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Paneer Butter Masala" tabindex="-1" aria-hidden="true"><img src="images/paneer-masala.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Curry" tabindex="-1" aria-hidden="true"><img src="images/chicken-curry.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Lollipop" tabindex="-1" aria-hidden="true"><img src="images/chicken-lollipop.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chow Mein · Mix" tabindex="-1" aria-hidden="true"><img src="images/chowmein.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Pani Puri" tabindex="-1" aria-hidden="true"><img src="images/pani-puri.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mango Lassi" tabindex="-1" aria-hidden="true"><img src="images/mango-lassi.jpg" alt="" loading="lazy" decoding="async"></button>
+    </div>
+  </div>
   <div class="view-hint" role="group" aria-label="Section layout">
     <span class="view-hint-label">View</span>
     <span class="view-hint-group">
@@ -996,6 +1113,35 @@
 </main>
 
 <footer>
+  <div class="taste-strip reverse" role="group" aria-label="Menu highlights — tap a photo to jump to the dish">
+    <div class="taste-strip-track">
+      <button class="taste-tile" data-target="Mango Lassi" aria-label="Mango Lassi — jump to dish"><img src="images/mango-lassi.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Pani Puri" aria-label="Pani Puri — jump to dish"><img src="images/pani-puri.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chow Mein · Mix" aria-label="Chow Mein — jump to dish"><img src="images/chowmein.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Lollipop" aria-label="Chicken Lollipop — jump to dish"><img src="images/chicken-lollipop.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Curry" aria-label="Chicken Curry — jump to dish"><img src="images/chicken-curry.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Paneer Butter Masala" aria-label="Paneer Butter Masala — jump to dish"><img src="images/paneer-masala.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Biryani · Basmati" aria-label="Mutton Biryani — jump to dish"><img src="images/mutton-biryani.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Tandoori Chicken · Whole" aria-label="Tandoori Chicken — jump to dish"><img src="images/tandoori-chicken.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Jhol Momo" aria-label="Jhol Momo — jump to dish"><img src="images/chilli-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Steamed Momo" aria-label="Steamed Momo — jump to dish"><img src="images/steamed-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Sekuwa" aria-label="Mutton Sekuwa — jump to dish"><img src="images/mutton-sekuwa.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Thakali Set · Mutton" aria-label="Thakali Set — jump to dish"><img src="images/thakali-set.jpg" alt="" loading="lazy" decoding="async"></button>
+      <!-- second copy — keeps the marquee seamless; hidden from assistive tech -->
+      <button class="taste-tile" data-target="Mango Lassi" tabindex="-1" aria-hidden="true"><img src="images/mango-lassi.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Pani Puri" tabindex="-1" aria-hidden="true"><img src="images/pani-puri.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chow Mein · Mix" tabindex="-1" aria-hidden="true"><img src="images/chowmein.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Lollipop" tabindex="-1" aria-hidden="true"><img src="images/chicken-lollipop.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Chicken Curry" tabindex="-1" aria-hidden="true"><img src="images/chicken-curry.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Paneer Butter Masala" tabindex="-1" aria-hidden="true"><img src="images/paneer-masala.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Biryani · Basmati" tabindex="-1" aria-hidden="true"><img src="images/mutton-biryani.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Tandoori Chicken · Whole" tabindex="-1" aria-hidden="true"><img src="images/tandoori-chicken.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Jhol Momo" tabindex="-1" aria-hidden="true"><img src="images/chilli-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Steamed Momo" tabindex="-1" aria-hidden="true"><img src="images/steamed-momo.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Mutton Sekuwa" tabindex="-1" aria-hidden="true"><img src="images/mutton-sekuwa.jpg" alt="" loading="lazy" decoding="async"></button>
+      <button class="taste-tile" data-target="Thakali Set · Mutton" tabindex="-1" aria-hidden="true"><img src="images/thakali-set.jpg" alt="" loading="lazy" decoding="async"></button>
+    </div>
+  </div>
   <div class="footer-deva">धन्यवाद</div>
   <div class="footer-thanks">Thank You</div>
   <div class="footer-thanks-kr">감 사 합 니 다</div>
@@ -1163,8 +1309,21 @@
     // in List / Grid view modes (CSS-controlled via body.view-list/grid).
     const countLabel = `${n} item${n === 1 ? '' : 's'}`;
     const chevron = '<svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    // Pick a photo to represent the section in Grid mode: a signature dish with
+    // a photo if there is one, else the first item that has a photo. Falls back
+    // to a dish icon when nothing in the section has an image. Hidden outside
+    // Grid mode via CSS, so it costs nothing in Card/List view.
+    const thumbItem = items.find(it => it.is_signature && itemPhotos(it).length)
+                   || items.find(it => itemPhotos(it).length);
+    const thumbUrl = thumbItem ? itemPhotos(thumbItem)[0] : null;
+    const thumb = `<div class="section-thumb" aria-hidden="true">${
+      thumbUrl
+        ? `<img src="${escapeAttr(thumbUrl)}" alt="" loading="lazy" decoding="async">`
+        : `<span class="section-thumb-icon">${dishIconSvg(items[0] || { name_en: section.name_en })}</span>`
+    }</div>`;
     return `
       <section id="${section.slug}" class="accent-${color}">
+        ${thumb}
         <div class="section-head">
           ${section.eyebrow ? `<div class="section-eyebrow ${color}">${section.eyebrow}</div>` : ''}
           <h2>${section.name_en}</h2>
@@ -1225,6 +1384,7 @@
       initGalleries();
       initLightbox();
       initDetail();
+      initTasteStrips();
     } catch (err) {
       console.error('Failed to load menu:', err);
       const m = document.getElementById('menuMain');
@@ -1416,6 +1576,34 @@
       document.body.style.overflow = '';
     }
     if (detailTrigger && detailTrigger.focus) detailTrigger.focus();
+  }
+
+  // Smooth-scroll the menu to a dish by its English name and flash it gold.
+  // Used by the hero/footer taste strips. No-op if no item matches (e.g. the
+  // dish was renamed in admin) so a click can never throw.
+  function jumpToItem(name) {
+    if (!name) return;
+    const safe = (window.CSS && CSS.escape) ? CSS.escape(name) : name.replace(/"/g, '\\"');
+    const el = document.querySelector(`.item[data-name="${safe}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('flash');
+    void el.offsetWidth;           // restart the animation if it's still mid-flash
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1900);
+  }
+
+  // Delegated taste-strip clicks → jump to the dish. Buttons cover keyboard
+  // (Enter/Space) natively, so no separate keydown handler is needed.
+  function initTasteStrips() {
+    if (initTasteStrips.done) return;
+    initTasteStrips.done = true;
+    document.querySelectorAll('.taste-strip').forEach((strip) => {
+      strip.addEventListener('click', (e) => {
+        const tile = e.target.closest('.taste-tile');
+        if (tile) jumpToItem(tile.dataset.target);
+      });
+    });
   }
 
   function initDetail() {
