@@ -20,5 +20,16 @@ update items set image_url = 'images/mango-lassi.jpg'  where name_en = 'Mango La
 update items set image_url = 'images/chicken-curry.jpg' where name_en = 'Chicken Curry';
 update items set image_url = 'images/mutton-curry.jpg' where name_en = 'Mutton Curry';
 
+-- Second batch of photos --------------------------------------------------
+update items set image_url = 'images/tandoori-chicken.jpg' where name_en = 'Tandoori Chicken · Whole';
+update items set image_url = 'images/tandoori-chicken.jpg' where name_en = 'Tandoori Chicken · Half';
+update items set image_url = 'images/butter-naan.jpg'      where name_en = 'Butter Nan';
+update items set image_url = 'images/butter-naan.jpg'      where name_en = 'Garlic Nan';
+update items set image_url = 'images/chicken-lollipop.jpg' where name_en = 'Chicken Lollipop';
+update items set image_url = 'images/mutton-biryani.jpg'   where name_en = 'Mutton Biryani · Basmati';
+update items set image_url = 'images/mutton-fry.jpg'       where name_en = 'Mutton Fry';
+update items set image_url = 'images/nepali-dhido.jpg'     where name_en = 'Nepali Dhido · Chicken';
+update items set image_url = 'images/pani-puri.jpg'        where name_en = 'Pani Puri';
+
 -- Quick check — list the items that now have a photo:
 -- select name_en, image_url from items where image_url is not null order by name_en;
